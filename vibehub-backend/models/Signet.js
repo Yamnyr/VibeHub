@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const SignetSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    tweetId: { type: mongoose.Schema.Types.ObjectId, ref: 'Tweet', required: true },
+    postId: { type: mongoose.Schema.Types.ObjectId, ref: 'Tweet', required: true },
     createdAt: { type: Date, default: Date.now }
 });
 

@@ -191,14 +191,14 @@ exports.getUserLikes = async (req, res) => {
         const likes = await Like.find({ userId: req.params.id })
             .sort({ createdAt: -1 })
             .populate({
-                path: 'tweetId',
+                path: 'postId',
                 populate: {
                     path: 'userId',
                     select: 'username profilePicture'
                 }
             });
 
-        const likedTweets = likes.map(like => like.tweetId);
+        const likedTweets = likes.map(like => like.postId);
         res.status(200).json(likedTweets);
     } catch (err) {
         console.error(err);
@@ -212,14 +212,14 @@ exports.getUserRetweets = async (req, res) => {
         const reposts = await Repost.find({ userId: req.params.id })
             .sort({ createdAt: -1 })
             .populate({
-                path: 'tweetId',
+                path: 'postId',
                 populate: {
                     path: 'userId',
                     select: 'username profilePicture'
                 }
             });
 
-        const retweetedTweets = reposts.map(repost => repost.tweetId);
+        const retweetedTweets = reposts.map(repost => repost.posttId);
         res.status(200).json(retweetedTweets);
     } catch (err) {
         console.error(err);
@@ -233,14 +233,14 @@ exports.getUserSignets = async (req, res) => {
         const signets = await Signet.find({ userId: req.userId })
             .sort({ createdAt: -1 })
             .populate({
-                path: 'tweetId',
+                path: 'postId',
                 populate: {
                     path: 'userId',
                     select: 'username profilePicture'
                 }
             });
 
-        const savedTweets = signets.map(signet => signet.tweetId);
+        const savedTweets = signets.map(signet => signet.postId);
         res.status(200).json(savedTweets);
     } catch (err) {
         console.error(err);
