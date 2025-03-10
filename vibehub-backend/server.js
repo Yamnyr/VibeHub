@@ -3,7 +3,12 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const userRoutes = require('./routes/userRoutes');
-// Importer d'autres routes au besoin
+const commentRoutes = require('./routes/commentRoutes');
+const likeRoutes = require('./routes/likeRoutes');
+const repostRoutes = require('./routes/repostRoutes');
+const followRoutes = require('./routes/followRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
+const postRoutes = require('./routes/postRoutes');
 
 dotenv.config();
 const app = express();
@@ -14,7 +19,13 @@ app.use(express.json());
 
 // Routes
 app.use('/api/users', userRoutes);
-// Ajouter d'autres routes au besoin
+app.use('/api/', repostRoutes);
+app.use('/api/', likeRoutes);
+app.use('/api/', commentRoutes);
+app.use('/api/', followRoutes);
+app.use('/api/', notificationRoutes);
+app.use('/api/', postRoutes);
+
 
 // Connexion à MongoDB
 mongoose.connect(process.env.MONGO_URI)
