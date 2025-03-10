@@ -3,7 +3,7 @@ const Post = require('../models/Post');
 
 exports.likePost = async (req, res) => {
     try {
-        const { userId } = req.body;
+        const userId = req.userId;
         const postId = req.params.id;
 
         const existingLike = await Like.findOne({ userId, postId });
@@ -20,7 +20,7 @@ exports.likePost = async (req, res) => {
 
 exports.unlikePost = async (req, res) => {
     try {
-        const { userId } = req.body;
+        const userId = req.userId;
         const postId = req.params.id;
 
         const like = await Like.findOneAndDelete({ userId, postId });
@@ -36,7 +36,7 @@ exports.unlikePost = async (req, res) => {
 
 exports.getUserLikedPosts = async (req, res) => {
     try {
-        const likes = await Like.find({ userId: req.params.id }).populate('postId');
+        const likes = await Like.find({ userId: req.userId }).populate('postId');
         res.status(200).json(likes);
     } catch (error) {
         res.status(500).json({ message: "Erreur lors de la récupération des posts likés", error });

@@ -5,7 +5,8 @@ const Repost = require('../models/Repost');
 
 exports.createPost = async (req, res) => {
     try {
-        const { userId, content, media, hashtags } = req.body;
+        const { content, media, hashtags } = req.body;
+        const userId = req.userId;
         const newPost = new Post({ userId, content, media, hashtags });
         await newPost.save();
         res.status(201).json({ message: "Post créé avec succès", post: newPost });
@@ -29,11 +30,18 @@ exports.getPostById = async (req, res) => {
 exports.updatePost = async (req, res) => {
     try {
         const { content, media } = req.body;
-        const updatedPost = await Post.findByIdAndUpdate(req.params.id, { content, media }, { new: true });
+        const userId = req.user.id;
+        const post = await Post.findById(req.params.id);
 
-        if (!updatedPost) {
+        if (!post) {
             return res.status(404).json({ message: "Post non trouvé" });
         }
+
+        if (post.userId.toString() !== userId) {
+            return res.status(403).json({ message: "Non autorisé à modifier ce post" });
+        }
+
+        const updatedPost = await Post.findByIdAndUpdate(req.params.id, { content, media }, { new: true });
 
         res.status(200).json({ message: "Post mis à jour", post: updatedPost });
     } catch (error) {

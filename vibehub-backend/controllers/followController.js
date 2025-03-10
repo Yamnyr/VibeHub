@@ -3,7 +3,7 @@ const User = require('../models/User');
 
 exports.followUser = async (req, res) => {
     try {
-        const { userId } = req.body;
+        const userId = req.userId;
         const followId = req.params.id;
 
         if (userId === followId) return res.status(400).json({ message: "Impossible de se suivre soi-même" });
@@ -23,7 +23,7 @@ exports.followUser = async (req, res) => {
 
 exports.unfollowUser = async (req, res) => {
     try {
-        const { userId } = req.body;
+        const userId = req.userId;
         const followId = req.params.id;
 
         const follow = await Follow.findOneAndDelete({ followerId: userId, followingId: followId });

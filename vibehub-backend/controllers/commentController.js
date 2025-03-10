@@ -3,7 +3,8 @@ const Like = require('../models/Like');
 
 exports.addComment = async (req, res) => {
     try {
-        const { userId, content } = req.body;
+        const { content } = req.body;
+        const userId = req.userId;
         const postId = req.params.id;
 
         const newComment = new Comment({ userId, postId, content });
@@ -52,7 +53,7 @@ exports.deleteComment = async (req, res) => {
 
 exports.likeComment = async (req, res) => {
     try {
-        const { userId } = req.body;
+        const userId = req.userId;
         const commentId = req.params.id;
 
         const existingLike = await Like.findOne({ userId, postId: commentId });

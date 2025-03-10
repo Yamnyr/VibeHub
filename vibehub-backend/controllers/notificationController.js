@@ -3,7 +3,7 @@ const User = require('../models/User');
 
 exports.getUserNotifications = async (req, res) => {
     try {
-        const { userId } = req.body;
+        const userId = req.userId;
         const notifications = await Notification.find({ userId }).sort({ createdAt: -1 });
 
         res.status(200).json(notifications);
@@ -26,7 +26,7 @@ exports.markNotificationAsRead = async (req, res) => {
 
 exports.markAllNotificationsAsRead = async (req, res) => {
     try {
-        const { userId } = req.body;
+        const userId = req.userId;
 
         await Notification.updateMany({ userId, isRead: false }, { isRead: true });
 
@@ -38,7 +38,8 @@ exports.markAllNotificationsAsRead = async (req, res) => {
 
 exports.updateNotificationSettings = async (req, res) => {
     try {
-        const { userId, notificationSettings } = req.body;
+        const { notificationSettings } = req.body;
+        const userId = req.userId;
 
         const user = await User.findByIdAndUpdate(userId, { notificationSettings }, { new: true });
 
