@@ -27,7 +27,7 @@ const seedDatabase = async () => {
 
         // 2. Créer les tweets
         const tweets = await postSeeder.seed(users);
-        console.log(`✅ ${tweets.length} tweets créés`);
+        console.log(`✅ ${tweets.length} post créés`);
 
         // 3. Créer les hashtags à partir des tweets
         const hashtags = await hashtagSeeder.seed(tweets);
@@ -47,7 +47,7 @@ const seedDatabase = async () => {
 
         // 7. Créer les retweets
         const retweets = await repostSeeder.seed(users, tweets);
-        console.log(`✅ ${retweets.length} retweets créés`);
+        console.log(`✅ ${retweets.length} reposts créés`);
 
         // 8. Créer les signets
         const signets = await signetSeeder.seed(users, tweets);
