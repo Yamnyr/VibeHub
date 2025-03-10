@@ -6,9 +6,9 @@ const PostSchema = new mongoose.Schema({
     media: [{ type: String }],
     hashtags: [{ type: String }],
     likesCount: { type: Number, default: 0 },
-    retweetsCount: { type: Number, default: 0 },
+    repostsCount: { type: Number, default: 0 },
     commentsCount: { type: Number, default: 0 },
     createdAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('Post', PostSchema);
+module.exports = mongoose.model('Post', PostSchema) ;

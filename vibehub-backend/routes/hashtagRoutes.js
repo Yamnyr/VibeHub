@@ -7,7 +7,7 @@ const router = express.Router();
 // Route pour les hashtags tendance
 router.get('/hashtags/trending', hashtagController.getTrendingHashtags); // Obtenir les hashtags tendance
 
-// Route pour les tweets avec un hashtag spécifique
-router.get('/hashtags/:hashtag/tweets', hashtagController.getTweetsByHashtag); // Obtenir les tweets avec un hashtag spécifique
+// Route pour les posts avec un hashtag spécifique
+router.get('/hashtags/:hashtag/posts', hashtagController.getPostsByHashtag); // Obtenir les posts avec un hashtag spécifique
 
 module.exports = router;

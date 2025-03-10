@@ -9,7 +9,7 @@ router.post('/register', userController.register);
 router.post('/login', userController.login);
 router.get('/profile/:username', userController.getUserByUsername);
 router.get('/:id', userController.getUserById);
-router.get('/:id/tweets', userController.getUserTweets);
+router.get('/:id/posts', userController.getUserPosts);
 router.get('/:id/followers', userController.getFollowers);
 router.get('/:id/following', userController.getFollowing);
 
@@ -20,7 +20,7 @@ router.get('/signets', authMiddleware, userController.getUserSignets);
 router.post('/:id/follow', authMiddleware, userController.followUser);
 router.delete('/:id/follow', authMiddleware, userController.unfollowUser);
 router.get('/:id/likes', authMiddleware, userController.getUserLikes);
-router.get('/:id/retweets', authMiddleware, userController.getUserRetweets);
+router.get('/:id/reposts', authMiddleware, userController.getUserPosts);
 router.get('/search', authMiddleware, userController.searchUsers);
 
 module.exports = router;

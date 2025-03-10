@@ -8,6 +8,7 @@ const followSeeder = require('./followSeeder');
 const repostSeeder = require('./repostSeeder');
 const signetSeeder = require('./signetSeeder');
 const hashtagSeeder = require('./hashtagSeeder');
+const notificationSeeder = require('./notificationSeeder'); // Nouveau seeder
 
 dotenv.config();
 
@@ -25,33 +26,37 @@ const seedDatabase = async () => {
         const users = await userSeeder.seed();
         console.log(`✅ ${users.length} utilisateurs créés`);
 
-        // 2. Créer les tweets
-        const tweets = await postSeeder.seed(users);
-        console.log(`✅ ${tweets.length} post créés`);
+        // 2. Créer les posts
+        const posts = await postSeeder.seed(users);
+        console.log(`✅ ${posts.length} posts créés`);
 
-        // 3. Créer les hashtags à partir des tweets
-        const hashtags = await hashtagSeeder.seed(tweets);
+        // 3. Créer les hashtags à partir des posts
+        const hashtags = await hashtagSeeder.seed(posts);
         console.log(`✅ ${hashtags.length} hashtags créés`);
 
-        // 4. Créer les commentaires sur les tweets
-        const comments = await commentSeeder.seed(users, tweets);
+        // 4. Créer les commentaires sur les posts
+        const comments = await commentSeeder.seed(users, posts);
         console.log(`✅ ${comments.length} commentaires créés`);
 
-        // 5. Créer les likes sur les tweets
-        const likes = await likeSeeder.seed(users, tweets);
+        // 5. Créer les likes sur les posts
+        const likes = await likeSeeder.seed(users, posts);
         console.log(`✅ ${likes.length} likes créés`);
 
         // 6. Créer les abonnements entre utilisateurs
         const follows = await followSeeder.seed(users);
         console.log(`✅ ${follows.length} abonnements créés`);
 
-        // 7. Créer les retweets
-        const retweets = await repostSeeder.seed(users, tweets);
-        console.log(`✅ ${retweets.length} reposts créés`);
+        // 7. Créer les reposts
+        const reposts = await repostSeeder.seed(users, posts);
+        console.log(`✅ ${reposts.length} reposts créés`);
 
         // 8. Créer les signets
-        const signets = await signetSeeder.seed(users, tweets);
+        const signets = await signetSeeder.seed(users, posts);
         console.log(`✅ ${signets.length} signets créés`);
+
+        // 9. Créer les notifications basées sur les interactions
+        const notifications = await notificationSeeder.seed(users);
+        console.log(`✅ ${notifications.length} notifications créées`);
 
         console.log('✅ Seeding terminé avec succès!');
 

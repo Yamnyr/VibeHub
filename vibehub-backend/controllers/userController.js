@@ -1,5 +1,5 @@
 const User = require('../models/User');
-const Tweet = require('../models/Post'); // Notez que le modèle s'appelle Post mais représente les tweets
+const Post = require('../models/Post'); // Notez que le modèle s'appelle Post mais représente les posts
 const Like = require('../models/Like');
 const Repost = require('../models/Repost');
 const Signet = require('../models/Signet');
@@ -171,21 +171,21 @@ exports.getCurrentUser = async (req, res) => {
     }
 };
 
-// Obtenir tous les tweets d'un utilisateur
-exports.getUserTweets = async (req, res) => {
+// Obtenir tous les posts d'un utilisateur
+exports.getUserPosts = async (req, res) => {
     try {
-        const tweets = await Tweet.find({ userId: req.params.id })
+        const posts = await Post.find({ userId: req.params.id })
             .sort({ createdAt: -1 })
             .populate('userId', 'username profilePicture');
 
-        res.status(200).json(tweets);
+        res.status(200).json(posts);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Erreur lors de la récupération des tweets' });
+        res.status(500).json({ error: 'Erreur lors de la récupération des posts' });
     }
 };
 
-// Obtenir tous les tweets likés par un utilisateur
+// Obtenir tous les posts likés par un utilisateur
 exports.getUserLikes = async (req, res) => {
     try {
         const likes = await Like.find({ userId: req.params.id })
@@ -198,16 +198,16 @@ exports.getUserLikes = async (req, res) => {
                 }
             });
 
-        const likedTweets = likes.map(like => like.postId);
-        res.status(200).json(likedTweets);
+        const likedPosts = likes.map(like => like.postId);
+        res.status(200).json(likedPosts);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Erreur lors de la récupération des tweets likés' });
+        res.status(500).json({ error: 'Erreur lors de la récupération des posts likés' });
     }
 };
 
-// Obtenir tous les retweets d'un utilisateur
-exports.getUserRetweets = async (req, res) => {
+// Obtenir tous les reposts d'un utilisateur
+exports.getUserReposts = async (req, res) => {
     try {
         const reposts = await Repost.find({ userId: req.params.id })
             .sort({ createdAt: -1 })
@@ -219,15 +219,15 @@ exports.getUserRetweets = async (req, res) => {
                 }
             });
 
-        const retweetedTweets = reposts.map(repost => repost.posttId);
-        res.status(200).json(retweetedTweets);
+        const repostedPosts = reposts.map(repost => repost.posttId);
+        res.status(200).json(repostedPosts);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Erreur lors de la récupération des retweets' });
+        res.status(500).json({ error: 'Erreur lors de la récupération des reposts' });
     }
 };
 
-// Obtenir tous les tweets enregistrés par un utilisateur
+// Obtenir tous les posts enregistrés par un utilisateur
 exports.getUserSignets = async (req, res) => {
     try {
         const signets = await Signet.find({ userId: req.userId })
@@ -240,11 +240,11 @@ exports.getUserSignets = async (req, res) => {
                 }
             });
 
-        const savedTweets = signets.map(signet => signet.postId);
-        res.status(200).json(savedTweets);
+        const savedPosts = signets.map(signet => signet.postId);
+        res.status(200).json(savedPosts);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Erreur lors de la récupération des tweets enregistrés' });
+        res.status(500).json({ error: 'Erreur lors de la récupération des posts enregistrés' });
     }
 };
 
