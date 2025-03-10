@@ -21,7 +21,7 @@ services:
     depends_on:
       - mongo
     environment:
-      - MONGO_URI=mongodb://mongo:27017/twitter_clone
+      - MONGO_URI=mongodb://mongo:27017/vibehub
     volumes:
       - ./vibehub-backend:/app
       - /app/node_modules
