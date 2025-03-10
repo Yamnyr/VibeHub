@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  # Service MongoDB
+  mongo:
+    image: mongo
+    container_name: twitter-mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  # Service Backend
+  backend:
+    build: ./vibehub-backend
+    container_name: vibehub-backend
+    restart: always
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/twitter_clone
+    volumes:
+      - ./vibehub-backend:/app
+      - /app/node_modules
+
+  # Service Frontend
+  frontend:
+    build: ./vibehub-frontend
+    container_name: vibehub-frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./vibehub-frontend:/app
+      - /app/node_modules
+
+volumes:
+  mongo_data:
