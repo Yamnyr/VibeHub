@@ -12,16 +12,16 @@ exports.register = async (req, res) => {
     const { username, email, password } = req.body;
 
     try {
-        // Vérifier si l'email ou le nom d'utilisateur existe déjà
+        // Check if the email or username already exists
         const existingUser = await User.findOne({ $or: [{ email }, { username }] });
         if (existingUser) {
             return res.status(400).json({ error: 'Email ou nom d\'utilisateur déjà pris.' });
         }
 
-        // Hacher le mot de passe
+        // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Créer un nouvel utilisateur
+        // Create a new user
         const newUser = new User({
             username,
             email,
@@ -30,12 +30,28 @@ exports.register = async (req, res) => {
 
         await newUser.save();
 
-        res.status(201).json({ message: 'Utilisateur créé avec succès' });
+        // Create a JWT token
+        const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        res.status(201).json({
+            message: 'Utilisateur créé avec succès',
+            token,
+            user: {
+                _id: newUser._id,
+                username: newUser.username,
+                email: newUser.email,
+                profilePicture: newUser.profilePicture,
+                bio: newUser.bio,
+                followersCount: newUser.followersCount,
+                followingCount: newUser.followingCount
+            }
+        });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Erreur lors de la création de l\'utilisateur' });
     }
 };
+
 
 // Connexion de l'utilisateur
 exports.login = async (req, res) => {

@@ -9,6 +9,7 @@ const repostRoutes = require('./routes/repostRoutes');
 const followRoutes = require('./routes/followRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const postRoutes = require('./routes/postRoutes');
+const connectDB = require("./config/db");
 
 dotenv.config();
 const app = express();
@@ -25,13 +26,11 @@ app.use('/api/', commentRoutes);
 app.use('/api/', followRoutes);
 app.use('/api/', notificationRoutes);
 app.use('/api/', postRoutes);
+app.get("/", (req, res) => {
+    res.send("Bienvenue sur l'API VibaeHub Clone !");
+});
 
-
-// Connexion à MongoDB
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('Connecté à MongoDB'))
-    .catch(err => console.error('Erreur de connexion à MongoDB:', err));
-
+connectDB()
 // Démarrer le serveur
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Serveur démarré sur le port ${PORT}`));
