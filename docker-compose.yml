@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Service MongoDB
   mongo:
@@ -26,7 +24,6 @@ services:
       - ./vibehub-backend:/app
       - /app/node_modules
 
-  # Service Frontend
   frontend:
     build: ./vibehub-frontend
     container_name: vibehub-frontend
@@ -35,6 +32,9 @@ services:
       - "3000:3000"
     depends_on:
       - backend
+    environment:
+      - NODE_ENV=development
+      - REACT_APP_API_URL=http://localhost:5000
     volumes:
       - ./vibehub-frontend:/app
       - /app/node_modules
