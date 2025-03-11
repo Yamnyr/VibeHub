@@ -76,16 +76,18 @@ def predict():
 @app.route("/moderate", methods=["POST"])
 def moderate():
     """ Modération d'un post """
+    print("je suis la ")
     data = request.get_json()
+    print(data)
     if "content" not in data:
         return jsonify({"error": "Aucun texte fourni"}), 400
 
     results = Detoxify('multilingual').predict(data["content"])
     if results["toxicity"] > 0.5 or results["severe_toxicity"] > 0.5 or results["obscene"] > 0.5 or results["identity_attack"] > 0.5 or results["insult"] > 0.5 or results["threat"] > 0.5 or results["sexual_explicit"] > 0.5:
-        return jsonify({"True"})
+        return jsonify({"IsToxic": True})
 
-    return jsonify({"False"})
+    return jsonify({"IsToxic": False})
 
 
 if __name__ == "__main__":
-    app.run(debug=True,port=5001)
+    app.run(debug=True,host='0.0.0.0', port=5001)
