@@ -26,7 +26,7 @@ export default function LoginForm() {
         return (
             <div className="text-center">
                 <p className="text-lg font-medium ">
-                    Vous êtes connecté en tant que <span className="font-bold">{user.user.nom}</span>.
+                    Vous êtes connecté en tant que <span className="font-bold">{user.username}</span>.
                 </p>
                 <button
                     onClick={logout}

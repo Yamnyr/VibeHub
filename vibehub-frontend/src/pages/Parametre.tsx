@@ -1,11 +1,11 @@
 import {useAuth} from "../context/AuthContext.tsx";
 import {LogOut} from "lucide-react";
 
-export default function Accueil() {
+export default function Parametre() {
 
     return (
         <div className="">
-            Accueil
+            Paramètre
         </div>
     );
 }

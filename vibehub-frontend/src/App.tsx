@@ -3,6 +3,9 @@ import Accueil from "./pages/Accueil";
 import Wrapper from "./components/Wrapper";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Profile from "./pages/Profile.tsx";
+import Parametre from "./pages/Parametre.tsx";
+import PostDetail from "./pages/PostDetail.tsx";
 import { AuthProvider } from "./context/AuthContext";
 
 function App() {
@@ -14,6 +17,10 @@ function App() {
                         <Route index element={<Accueil/>}/>
                         <Route path="login" element={<Login/>}/>
                         <Route path="register" element={<Register/>}/>
+                        <Route path="Profile" element={<Profile/>}/>
+                        <Route path="postdetail/:id" element={<PostDetail/>}/>
+                        <Route path="register" element={<Register/>}/>
+                        <Route path="parametre" element={<Parametre/>}/>
                     </Routes>
                 </Wrapper>
             </BrowserRouter>
