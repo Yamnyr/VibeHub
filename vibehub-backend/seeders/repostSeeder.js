@@ -6,29 +6,12 @@ const generateReposts = (users, posts, count = 80) => {
     const reposts = []
     const repostMap = new Map() // To avoid duplicates
 
-    // Make sure we have valid posts and users to work with
-    if (!posts || posts.length === 0) {
-        console.error("No posts provided for generating reposts")
-        return []
-    }
-
-    if (!users || users.length === 0) {
-        console.error("No users provided for generating reposts")
-        return []
-    }
-
     // Filter out any posts or users that don't have a valid _id
     const validPosts = posts.filter((post) => post && post._id)
     const validUsers = users.filter((user) => user && user._id)
 
-    if (validPosts.length === 0) {
-        console.error("No valid posts with _id found")
-        return []
-    }
-
-    if (validUsers.length === 0) {
-        console.error("No valid users with _id found")
-        return []
+    if (validPosts.length === 0 || validUsers.length === 0) {
+        throw new Error("No valid posts or users found for generating reposts")
     }
 
     // Possible comments for reposts
@@ -78,7 +61,6 @@ const generateReposts = (users, posts, count = 80) => {
         }
     }
 
-    console.log(`Generated ${reposts.length} reposts from ${attempts} attempts`)
     return reposts
 }
 
@@ -86,32 +68,18 @@ const generateReposts = (users, posts, count = 80) => {
 const seed = async (users, posts) => {
     try {
         // Validate inputs
-        if (!users || users.length === 0) {
-            throw new Error("No users provided for repost seeding")
-        }
-
-        if (!posts || posts.length === 0) {
-            throw new Error("No posts provided for repost seeding")
+        if (!users || users.length === 0 || !posts || posts.length === 0) {
+            throw new Error("Invalid input for repost seeding")
         }
 
         // Delete all existing reposts
         await Repost.deleteMany({})
-        console.log("Deleted existing reposts")
 
         // Generate random reposts with comments
         const repostsData = generateReposts(users, posts)
 
-        if (repostsData.length === 0) {
-            console.log("No reposts generated, skipping insertion")
-            return []
-        }
-
-        // Log a sample repost for debugging
-        console.log("Sample repost data:", repostsData[0])
-
         // Insert reposts into the database
         const createdReposts = await Repost.insertMany(repostsData)
-        console.log(`Inserted ${createdReposts.length} reposts`)
 
         // Update repost count for each post
         for (const post of posts) {

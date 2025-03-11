@@ -2,13 +2,10 @@ const Notification = require("../models/Notification")
 const Like = require("../models/Like")
 const Repost = require("../models/Repost")
 const Follow = require("../models/Follow")
-const User = require("../models/User")
 const Post = require("../models/Post")
-// Add the missing import for Comment model
-// If you don't have a separate Comment model, we'll handle that case
 
 // Function to generate notifications based on existing interactions
-const generateNotifications = async (users) => {
+const generateNotifications = async () => {
     const notifications = []
 
     try {
@@ -30,10 +27,10 @@ const generateNotifications = async (users) => {
                 like.userId._id.toString() !== like.postId.userId._id.toString()
             ) {
                 notifications.push({
-                    userId: like.postId.userId._id, // User receiving the notification (post author)
+                    userId: like.postId.userId._id,
                     type: "like",
                     message: `${like.userId.username} a aimé votre post`,
-                    isRead: Math.random() > 0.7, // 30% chance of being unread
+                    isRead: Math.random() > 0.7,
                     createdAt: like.createdAt || new Date(),
                 })
             }
@@ -57,18 +54,16 @@ const generateNotifications = async (users) => {
                 repost.userId._id.toString() !== repost.postId.userId._id.toString()
             ) {
                 notifications.push({
-                    userId: repost.postId.userId._id, // User receiving the notification (post author)
+                    userId: repost.postId.userId._id,
                     type: "repost",
                     message: `${repost.userId.username} a reposté votre post`,
-                    isRead: Math.random() > 0.7, // 30% chance of being unread
+                    isRead: Math.random() > 0.7,
                     createdAt: repost.createdAt || new Date(),
                 })
             }
         }
 
         // 3. Notifications for comments
-        // Based on your Post schema, it seems comments are stored as posts with a parentId
-        // So we'll find posts that are comments (have a parentId)
         const comments = await Post.find({ parentId: { $ne: null } })
             .populate("userId", "username")
             .populate({
@@ -86,10 +81,10 @@ const generateNotifications = async (users) => {
                 comment.userId._id.toString() !== comment.parentId.userId._id.toString()
             ) {
                 notifications.push({
-                    userId: comment.parentId.userId._id, // User receiving the notification (post author)
+                    userId: comment.parentId.userId._id,
                     type: "comment",
                     message: `${comment.userId.username} a commenté votre post`,
-                    isRead: Math.random() > 0.7, // 30% chance of being unread
+                    isRead: Math.random() > 0.7,
                     createdAt: comment.createdAt || new Date(),
                 })
             }
@@ -101,16 +96,15 @@ const generateNotifications = async (users) => {
         for (const follow of follows) {
             if (follow.followerId && follow.followingId) {
                 notifications.push({
-                    userId: follow.followingId._id, // User receiving the notification (the one being followed)
+                    userId: follow.followingId._id,
                     type: "follow",
                     message: `${follow.followerId.username} a commencé à vous suivre`,
-                    isRead: Math.random() > 0.7, // 30% chance of being unread
+                    isRead: Math.random() > 0.7,
                     createdAt: follow.createdAt || new Date(),
                 })
             }
         }
 
-        console.log(`Generated ${notifications.length} notifications`)
         return notifications
     } catch (error) {
         console.error("Error generating notifications:", error)
@@ -128,22 +122,12 @@ const seed = async (users) => {
 
         // Delete all existing notifications
         await Notification.deleteMany({})
-        console.log("Deleted existing notifications")
 
         // Generate notifications based on existing interactions
-        const notificationsData = await generateNotifications(users)
-
-        if (notificationsData.length === 0) {
-            console.log("No notifications generated, skipping insertion")
-            return []
-        }
-
-        // Log a sample notification for debugging
-        console.log("Sample notification data:", notificationsData[0])
+        const notificationsData = await generateNotifications()
 
         // Insert notifications into the database
         const createdNotifications = await Notification.insertMany(notificationsData)
-        console.log(`Inserted ${createdNotifications.length} notifications`)
 
         return createdNotifications
     } catch (error) {

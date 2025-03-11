@@ -1,71 +1,72 @@
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const userSeeder = require('./userSeeder');
-const postSeeder = require('./postSeeder');
-const likeSeeder = require('./likeSeeder');
-const followSeeder = require('./followSeeder');
-const repostSeeder = require('./repostSeeder');
-const signetSeeder = require('./signetSeeder');
-const hashtagSeeder = require('./hashtagSeeder');
-const notificationSeeder = require('./notificationSeeder'); // Nouveau seeder
+const mongoose = require("mongoose")
+const dotenv = require("dotenv")
+const userSeeder = require("./userSeeder")
+const postSeeder = require("./postSeeder")
+const likeSeeder = require("./likeSeeder")
+const followSeeder = require("./followSeeder")
+const repostSeeder = require("./repostSeeder")
+const signetSeeder = require("./signetSeeder")
+const hashtagSeeder = require("./hashtagSeeder")
+const notificationSeeder = require("./notificationSeeder")
 
-dotenv.config();
+dotenv.config()
 
-// Fonction pour exécuter tous les seeders
+// Function to run all seeders
 const seedDatabase = async () => {
     try {
-        // Connexion à MongoDB
-        await mongoose.connect(process.env.MONGO_URI);
-        console.log('Connecté à MongoDB pour le seeding');
+        // Connect to MongoDB
+        await mongoose.connect(process.env.MONGO_URI)
+        console.log("Connected to MongoDB for seeding")
 
-        // Exécution des seeders dans l'ordre
-        console.log('Début du seeding...');
+        // Run seeders in order
+        console.log("Starting seeding process...")
 
-        // 1. Créer les utilisateurs en premier
-        const users = await userSeeder.seed();
-        console.log(`✅ ${users.length} utilisateurs créés`);
+        // 1. Create users first
+        const users = await userSeeder.seed()
+        console.log(`✅ Created ${users.length} users`)
 
-        // 2. Créer les posts
-        const posts = await postSeeder.seed(users);
-        console.log(`✅ ${posts.length} posts créés`);
+        // 2. Create posts
+        const posts = await postSeeder.seed(users)
+        console.log(`✅ Created ${posts.length} posts`)
 
-        // 3. Créer les hashtags à partir des posts
-        const hashtags = await hashtagSeeder.seed(posts);
-        console.log(`✅ ${hashtags.length} hashtags créés`);
+        // 3. Create hashtags from posts
+        const hashtags = await hashtagSeeder.seed(posts)
+        console.log(`✅ Created ${hashtags.length} hashtags`)
 
-        // 5. Créer les likes sur les posts
-        const likes = await likeSeeder.seed(users, posts);
-        console.log(`✅ ${likes.length} likes créés`);
+        // 4. Create likes on posts
+        const likes = await likeSeeder.seed(users, posts)
+        console.log(`✅ Created ${likes.length} likes`)
 
-        // 6. Créer les abonnements entre utilisateurs
-        const follows = await followSeeder.seed(users);
-        console.log(`✅ ${follows.length} abonnements créés`);
+        // 5. Create follows between users
+        const follows = await followSeeder.seed(users)
+        console.log(`✅ Created ${follows.length} follows`)
 
-        // 7. Créer les reposts
-        const reposts = await repostSeeder.seed(users, posts);
-        console.log(`✅ ${reposts.length} reposts créés`);
+        // 6. Create reposts
+        const reposts = await repostSeeder.seed(users, posts)
+        console.log(`✅ Created ${reposts.length} reposts`)
 
-        // 8. Créer les signets
-        const signets = await signetSeeder.seed(users, posts);
-        console.log(`✅ ${signets.length} signets créés`);
+        // 7. Create bookmarks
+        const signets = await signetSeeder.seed(users, posts)
+        console.log(`✅ Created ${signets.length} bookmarks`)
 
-        // 9. Créer les notifications basées sur les interactions
-        const notifications = await notificationSeeder.seed(users);
-        console.log(`✅ ${notifications.length} notifications créées`);
+        // 8. Create notifications based on interactions
+        const notifications = await notificationSeeder.seed(users)
+        console.log(`✅ Created ${notifications.length} notifications`)
 
-        console.log('✅ Seeding terminé avec succès!');
+        console.log("✅ Seeding completed successfully!")
 
-        // Déconnexion de MongoDB
-        await mongoose.disconnect();
-        console.log('Déconnecté de MongoDB');
+        // Disconnect from MongoDB
+        await mongoose.disconnect()
+        console.log("Disconnected from MongoDB")
 
-        process.exit(0);
+        process.exit(0)
     } catch (error) {
-        console.error('❌ Erreur lors du seeding:', error);
-        await mongoose.disconnect();
-        process.exit(1);
+        console.error("❌ Error during seeding:", error)
+        await mongoose.disconnect()
+        process.exit(1)
     }
-};
+}
 
-// Exécuter le seeding
-seedDatabase();
+// Run the seeding
+seedDatabase()
+
