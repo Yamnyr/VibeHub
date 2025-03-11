@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import torch
-from transformers import AutoImageProcessor, AutoModelForImageClassification
+from transformers import AutoImageProcessor, AutoModelForImageClassification,pipeline
 from PIL import Image
 import numpy as np
 import cv2
@@ -21,7 +21,8 @@ model = AutoModelForImageClassification.from_pretrained(MODEL_NAME)
 
 # Détecteur de visages OpenCV
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-
+summarizer = pipeline("summarization", model="google/flan-t5-large")
+translator = pipeline("translation", model="google/flan-t5-large")
 def preprocess_image(image_data):
     """ Convertit l'image base64 en format OpenCV """
     image_bytes = base64.b64decode(image_data.split(",")[1])
@@ -88,6 +89,47 @@ def moderate():
 
     return jsonify({"IsToxic": False})
 
+@app.route("/translate", methods=["POST"])
+def translate():
+    """Traduction d'un texte"""
+    data = request.get_json()
+
+    # Vérification des entrées
+    if not data or "content" not in data:
+        return jsonify({"error": "Aucun texte fourni"}), 400
+    if "language" not in data:
+        return jsonify({"error": "Langue cible non spécifiée"}), 400
+
+    target_language = data["language"]
+    text = data["content"]
+
+    # Construction de la requête de traduction
+    texte_avec_instruction = f"Translate the following text to {target_language}: {text}"
+
+    try:
+        # Exécuter la traduction
+        traduction = translator(texte_avec_instruction,max_length=400)
+        print(traduction)
+        return jsonify({"translated_text": traduction[0]['translation_text']})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/resume", methods=["POST"])
+def resume():    
+    """ résumé d'un post """
+    data = request.get_json()
+    print(data)
+    if "content" not in data:
+        return jsonify({"error": "Aucun texte fourni"}), 400
+    # Ajouter une instruction explicite pour forcer le résumé en français
+    texte_avec_instruction = "If the text is in french, just resume it. If the text is in english, translate to french and resume it : " + data["content"]
+    ListesMots = texte_avec_instruction.split(" ")
+
+    # Générer un résumé
+    resume = summarizer(texte_avec_instruction, max_length=len(ListesMots), min_length=15, do_sample=False)
+
+    return jsonify(resume[0]['summary_text'])
 
 if __name__ == "__main__":
     app.run(debug=True,host='0.0.0.0', port=5001)
