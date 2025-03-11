@@ -15,7 +15,7 @@ exports.createPost = async (req, res) => {
 
         const flaskData = await flaskResponse.json();
         console.log(flaskData);
-        if (flaskData.IsToxic === true) {
+        if (flaskData === "True") {
             return res.status(400).json({ message: "Contenu inapproprié" });
         }
         const newPost = new Post({

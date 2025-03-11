@@ -1,6 +1,9 @@
 import React from 'react';
+import {useAuth} from "../context/AuthContext.tsx";
+
 
 const UserProfile = () => {
+  const { logout, token, user } = useAuth();
   return (
     <div className="bg-secondary p-4 border-b-2">
       <div className="flex flex-col items-center text-center">
@@ -11,20 +14,21 @@ const UserProfile = () => {
             className="w-16 h-16 rounded-full"
           />
           <div className="text-left">
-            <h2 className="text-lg font-bold">John Doe</h2>
-            <p className="text-secondary text-sm">@johndoe</p>
+            <h2 className="text-lg font-bold">{user?.username}</h2>
+            <p className="text-secondary text-sm">@{user?.username}</p>
           </div>
         </div>
 
         <p className="text-sm mb-4">
           Passionné de développement web et amateur de café.
+          {user?.email}
         </p>
 
         <div className="flex justify-center space-x-6 text-sm">
           {[
             { label: "Posts", value: 120 },
-            { label: "Followers", value: 450 },
-            { label: "Following", value: 180 },
+            { label: "Followers", value: user?.followersCount} ,
+            { label: "Following", value: user?.followingCount },
           ].map((stat, i) => (
             <div key={i} className="text-center">
               <span className="text-secondary">{stat.label}</span>

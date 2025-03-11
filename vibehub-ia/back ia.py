@@ -77,15 +77,14 @@ def predict():
 def moderate():
     """ Modération d'un post """
     data = request.get_json()
-    if "text" not in data:
+    if "content" not in data:
         return jsonify({"error": "Aucun texte fourni"}), 400
 
-    results = Detoxify('multilingual').predict(data["text"])
+    results = Detoxify('multilingual').predict(data["content"])
     if results["toxicity"] > 0.5 or results["severe_toxicity"] > 0.5 or results["obscene"] > 0.5 or results["identity_attack"] > 0.5 or results["insult"] > 0.5 or results["threat"] > 0.5 or results["sexual_explicit"] > 0.5:
-        return jsonify("IsToxic : True")
+        return jsonify({"True"})
 
-    return jsonify("IsToxic : False")
-
+    return jsonify({"False"})
 
 
 if __name__ == "__main__":
