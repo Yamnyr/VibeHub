@@ -1,20 +1,23 @@
 import React from 'react';
 import { Home, User, Bell, Mail, BookMarked, Settings, LogOut } from 'lucide-react';
+import UserProfile from './UserProfile';
+import NotificationDropdown from "./NotificationDropdown";
+
 
 function Sidebar() {
     return (
         <div className="fixed h-screen w-64 border-r border-gray-700 p-4">
             <div className="flex flex-col space-y-6">
-                <div className="text-2xl font-bold text-[var(--accent)]">Chirper</div>
+                <div className="text-2xl font-bold text-[var(--accent)]">VibeHub</div>
                 <nav className="space-y-4">
+                    <UserProfile />
                     <a href="#" className="flex items-center space-x-3 text-lg text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors">
                         <Home /> <span>Home</span>
                     </a>
                     <a href="#" className="flex items-center space-x-3 text-lg text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors">
-                        <Bell /> <span>Notifications</span>
-                    </a>
-                    <a href="#" className="flex items-center space-x-3 text-lg text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors">
-                        <Mail /> <span>Messages</span>
+                        <div className="flex items-center space-x-3">
+                            <NotificationDropdown />
+                        </div>
                     </a>
                     <a href="#" className="flex items-center space-x-3 text-lg text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors">
                         <BookMarked /> <span>Bookmarks</span>
