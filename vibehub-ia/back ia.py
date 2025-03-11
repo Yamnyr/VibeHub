@@ -8,7 +8,7 @@ import cv2
 import base64
 from io import BytesIO
 import os
-
+from detoxify import Detoxify
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 
 app = Flask(__name__)
@@ -73,5 +73,20 @@ def predict():
 
     return jsonify(result)
 
+@app.route("/moderate", methods=["POST"])
+def moderate():
+    """ Modération d'un post """
+    data = request.get_json()
+    if "text" not in data:
+        return jsonify({"error": "Aucun texte fourni"}), 400
+
+    results = Detoxify('multilingual').predict(data["text"])
+    if results["toxicity"] > 0.5 or results["severe_toxicity"] > 0.5 or results["obscene"] > 0.5 or results["identity_attack"] > 0.5 or results["insult"] > 0.5 or results["threat"] > 0.5 or results["sexual_explicit"] > 0.5:
+        return jsonify("IsToxic : True")
+
+    return jsonify("IsToxic : False")
+
+
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True,port=5001)

@@ -7,6 +7,17 @@ exports.createPost = async (req, res) => {
         const { content, media, hashtags, parentId } = req.body;
         const userId = req.userId;
 
+        const flaskResponse = await fetch("http://127.0.0.1:5001/moderate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ content }),
+        });
+
+        const flaskData = await flaskResponse.json();
+        console.log(flaskData);
+        if (flaskData.IsToxic === true) {
+            return res.status(400).json({ message: "Contenu inapproprié" });
+        }
         const newPost = new Post({
             userId,
             content,
