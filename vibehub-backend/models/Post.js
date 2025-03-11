@@ -5,10 +5,11 @@ const PostSchema = new mongoose.Schema({
     content: { type: String, required: true },
     media: [{ type: String }],
     hashtags: [{ type: String }],
+    parentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Post', default: null },
     likesCount: { type: Number, default: 0 },
     repostsCount: { type: Number, default: 0 },
     commentsCount: { type: Number, default: 0 },
     createdAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('Post', PostSchema) ;
+module.exports = mongoose.model('Post', PostSchema);

@@ -1,55 +1,101 @@
-const Like = require('../models/Like');
-const Post = require('../models/Post');
+const Like = require("../models/Like")
+const Post = require("../models/Post")
 
-// Fonction pour générer des likes aléatoires
+// Function to generate random likes
 const generateLikes = (users, posts, count = 150) => {
-    const likes = [];
-    const likeMap = new Map(); // Pour éviter les doublons
+    const likes = []
+    const likeMap = new Map() // To avoid duplicates
 
-    for (let i = 0; i < count; i++) {
-        const randomUser = users[Math.floor(Math.random() * users.length)];
-        const randomPost = posts[Math.floor(Math.random() * posts.length)];
+    // Make sure we have valid posts to work with
+    if (!posts || posts.length === 0) {
+        console.error("No posts provided for generating likes")
+        return []
+    }
 
-        // Créer une clé unique pour éviter les doublons
-        const likeKey = `${randomUser._id}-${randomPost._id}`;
+    // Filter out any posts that don't have a valid _id
+    const validPosts = posts.filter((post) => post && post._id)
 
-        // Vérifier si ce like existe déjà
+    if (validPosts.length === 0) {
+        console.error("No valid posts with _id found")
+        return []
+    }
+
+    let attempts = 0
+    const maxAttempts = count * 2 // Avoid infinite loop
+
+    while (likes.length < count && attempts < maxAttempts) {
+        attempts++
+        const randomUser = users[Math.floor(Math.random() * users.length)]
+        const randomPost = validPosts[Math.floor(Math.random() * validPosts.length)]
+
+        // Skip if either user or post is invalid
+        if (!randomUser || !randomUser._id || !randomPost || !randomPost._id) {
+            continue
+        }
+
+        // Create a unique key to avoid duplicates
+        const likeKey = `${randomUser._id}-${randomPost._id}`
+
+        // Check if this like already exists
         if (!likeMap.has(likeKey)) {
             likes.push({
                 userId: randomUser._id,
-                postId: randomPost._id
-            });
+                postId: randomPost._id, // Ensure this is a valid ObjectId
+            })
 
-            likeMap.set(likeKey, true);
+            likeMap.set(likeKey, true)
         }
     }
 
-    return likes;
-};
+    console.log(`Generated ${likes.length} likes from ${attempts} attempts`)
+    return likes
+}
 
-// Fonction pour créer les likes
+// Function to create likes
 const seed = async (users, posts) => {
     try {
-        // Supprimer tous les likes existants
-        await Like.deleteMany({});
-
-        // Générer des likes aléatoires
-        const likesData = generateLikes(users, posts);
-
-        // Insérer les likes dans la base de données
-        const createdLikes = await Like.insertMany(likesData);
-
-        // Mettre à jour le nombre de likes pour chaque post
-        for (const post of posts) {
-            const likeCount = await Like.countDocuments({ postId: post._id });
-            await Post.findByIdAndUpdate(post._id, { likesCount: likeCount });
+        // Validate inputs
+        if (!users || users.length === 0) {
+            throw new Error("No users provided for like seeding")
         }
 
-        return createdLikes;
-    } catch (error) {
-        console.error('Erreur lors de la création des likes:', error);
-        throw error;
-    }
-};
+        if (!posts || posts.length === 0) {
+            throw new Error("No posts provided for like seeding")
+        }
 
-module.exports = { seed };
+        // Delete all existing likes
+        await Like.deleteMany({})
+        console.log("Deleted existing likes")
+
+        // Generate random likes
+        const likesData = generateLikes(users, posts)
+
+        if (likesData.length === 0) {
+            console.log("No likes generated, skipping insertion")
+            return []
+        }
+
+        // Log a sample like for debugging
+        console.log("Sample like data:", likesData[0])
+
+        // Insert likes into the database
+        const createdLikes = await Like.insertMany(likesData)
+        console.log(`Inserted ${createdLikes.length} likes`)
+
+        // Update like count for each post
+        for (const post of posts) {
+            if (post && post._id) {
+                const likeCount = await Like.countDocuments({ postId: post._id })
+                await Post.findByIdAndUpdate(post._id, { likesCount: likeCount })
+            }
+        }
+
+        return createdLikes
+    } catch (error) {
+        console.error("Error creating likes:", error)
+        throw error
+    }
+}
+
+module.exports = { seed }
+

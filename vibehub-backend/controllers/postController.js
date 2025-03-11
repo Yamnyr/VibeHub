@@ -1,14 +1,27 @@
 const Post = require('../models/Post');
-const Comment = require('../models/Comment');
 const Like = require('../models/Like');
 const Repost = require('../models/Repost');
 
 exports.createPost = async (req, res) => {
     try {
-        const { content, media, hashtags } = req.body;
+        const { content, media, hashtags, parentId } = req.body;
         const userId = req.userId;
-        const newPost = new Post({ userId, content, media, hashtags });
+
+        const newPost = new Post({
+            userId,
+            content,
+            media,
+            hashtags,
+            parentId // Peut être null (post principal) ou l'ID d'un post parent (commentaire)
+        });
+
         await newPost.save();
+
+        // Si c'est un commentaire, mettre à jour le compteur de commentaires du post parent
+        if (parentId) {
+            await Post.findByIdAndUpdate(parentId, { $inc: { commentsCount: 1 } });
+        }
+
         res.status(201).json({ message: "Post créé avec succès", post: newPost });
     } catch (error) {
         res.status(500).json({ message: "Erreur lors de la création du post", error });
@@ -29,7 +42,7 @@ exports.getPostById = async (req, res) => {
 
 exports.updatePost = async (req, res) => {
     try {
-        const { content, media } = req.body;
+        const { content, media, hashtags } = req.body;
         const userId = req.user.id;
         const post = await Post.findById(req.params.id);
 
@@ -41,7 +54,11 @@ exports.updatePost = async (req, res) => {
             return res.status(403).json({ message: "Non autorisé à modifier ce post" });
         }
 
-        const updatedPost = await Post.findByIdAndUpdate(req.params.id, { content, media }, { new: true });
+        const updatedPost = await Post.findByIdAndUpdate(
+            req.params.id,
+            { content, media, hashtags },
+            { new: true }
+        );
 
         res.status(200).json({ message: "Post mis à jour", post: updatedPost });
     } catch (error) {
@@ -56,6 +73,16 @@ exports.deletePost = async (req, res) => {
             return res.status(404).json({ message: "Post non trouvé" });
         }
 
+        // Si c'est un commentaire, décrémenter le compteur du post parent
+        if (post.parentId) {
+            await Post.findByIdAndUpdate(post.parentId, { $inc: { commentsCount: -1 } });
+        }
+
+        // Supprimer tous les commentaires associés à ce post si c'est un post principal
+        if (!post.parentId) {
+            await Post.deleteMany({ parentId: req.params.id });
+        }
+
         await Post.findByIdAndDelete(req.params.id);
         res.status(200).json({ message: "Post supprimé avec succès" });
     } catch (error) {
@@ -65,7 +92,9 @@ exports.deletePost = async (req, res) => {
 
 exports.getPostComments = async (req, res) => {
     try {
-        const comments = await Comment.find({ postId: req.params.id }).populate('userId', 'username profilePicture');
+        const comments = await Post.find({ parentId: req.params.id })
+            .populate('userId', 'username profilePicture')
+            .sort({ createdAt: -1 });
         res.status(200).json(comments);
     } catch (error) {
         res.status(500).json({ message: "Erreur lors de la récupération des commentaires", error });

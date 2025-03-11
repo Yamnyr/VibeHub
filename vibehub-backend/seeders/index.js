@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const userSeeder = require('./userSeeder');
 const postSeeder = require('./postSeeder');
-const commentSeeder = require('./commentSeeder');
 const likeSeeder = require('./likeSeeder');
 const followSeeder = require('./followSeeder');
 const repostSeeder = require('./repostSeeder');
@@ -33,10 +32,6 @@ const seedDatabase = async () => {
         // 3. Créer les hashtags à partir des posts
         const hashtags = await hashtagSeeder.seed(posts);
         console.log(`✅ ${hashtags.length} hashtags créés`);
-
-        // 4. Créer les commentaires sur les posts
-        const comments = await commentSeeder.seed(users, posts);
-        console.log(`✅ ${comments.length} commentaires créés`);
 
         // 5. Créer les likes sur les posts
         const likes = await likeSeeder.seed(users, posts);
