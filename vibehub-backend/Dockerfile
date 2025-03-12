@@ -10,4 +10,5 @@ COPY . .
 
 EXPOSE 5000
 
-CMD ["npm", "start"]
+# Exécute la commande de seed avant de démarrer l'application
+CMD npm run seed && npm start
