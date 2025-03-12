@@ -4,7 +4,7 @@ import axios, { type AxiosRequestConfig } from "axios"
 export interface User {
     _id: string
     username: string
-    profileImage: string
+    profilePicture: string
 }
 
 export interface Post {

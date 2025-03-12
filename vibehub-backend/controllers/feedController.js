@@ -47,7 +47,7 @@ exports.getGlobalFeed = async (req, res) => {
             ]
         })
             .sort({ createdAt: -1 })
-            .populate('userId', 'username profileImage')
+            .populate('userId', 'username profilePicture')
             .lean(); // Utilisation de lean() pour travailler avec des objets JavaScript simples
 
         // Ajouter si l'utilisateur a liké ou reposté le post

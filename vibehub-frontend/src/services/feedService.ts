@@ -13,7 +13,7 @@ export interface Post {
     userId: {
         _id: string;
         username: string;
-        profileImage: string;
+        profilePicture: string;
     };
     content: string;
     createdAt: string;

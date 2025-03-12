@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {Heart, MessageCircle, Repeat2, ArrowLeft, Bookmark} from "lucide-react";
 import PostService, { Post as PostType } from "../services/postService";
+import AvatarPlaceholder from "../components/Avatar.tsx";
 
 interface Comment {
   _id: string;
@@ -52,7 +53,6 @@ const PostDetail: React.FC = () => {
         setIsLoading(false);
       }
     };
-
     fetchPostDetails();
   }, [id]);
 
@@ -162,7 +162,10 @@ const PostDetail: React.FC = () => {
         </div>
     );
   }
-
+  const handleProfileClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Empêche d'ouvrir le post en même temps
+    navigate(`/profile/${post.userId._id}`);
+  };
   return (
       <div className="max-w-xl mx-auto mt-5">
         <button
@@ -175,11 +178,9 @@ const PostDetail: React.FC = () => {
         {/* Post principal */}
         <div className="bg-[var(--bg-secondary)] border border-gray-700 rounded-lg p-4 mb-4">
           <div className="flex space-x-4">
-            <img
-                src={post.userId.profileImage || "/placeholder.svg"}
-                alt={post.userId.username}
-                className="w-12 h-12 rounded-full"
-            />
+            <div onClick={handleProfileClick} className="cursor-pointer">
+              <AvatarPlaceholder src={post.userId.profilePicture} size="w-16 h-16"/>
+            </div>
             <div className="flex-1">
               <div className="flex items-center space-x-2">
                 <span className="font-bold text-[var(--text-primary)]">{post.userId.username}</span>
@@ -198,7 +199,7 @@ const PostDetail: React.FC = () => {
                           <div key={index} className="overflow-hidden rounded-lg border border-gray-600">
                             {isVideo(fullUrl) ? (
                                 <video controls className="w-full h-auto rounded-lg">
-                                  <source src={fullUrl} type={`video/${fullUrl.split('.').pop()}`} />
+                                  <source src={fullUrl} type={`video/${fullUrl.split('.').pop()}`}/>
                                   Votre navigateur ne supporte pas la lecture de vidéos.
                                 </video>
                             ) : (

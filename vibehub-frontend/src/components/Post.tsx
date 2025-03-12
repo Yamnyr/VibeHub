@@ -5,8 +5,8 @@ import { useNavigate } from "react-router-dom";
 import AvatarPlaceholder from "./Avatar.tsx";
 
 interface PostUser {
+  id: string;
   avatar: string;
-  name: string;
   username: string;
   profilePicture: string;
 }
@@ -93,12 +93,6 @@ const Post: React.FC<PostProps> = ({
     }
   };
 
-  const handlePostClick = () => {
-    if (id) {
-      navigate(`/post/${id}`);
-    }
-  };
-
   // Fonction pour obtenir l'URL complète d'un média
   const getMediaUrl = (url: string) => {
     // Si l'URL est déjà absolue, ne pas la modifier
@@ -110,17 +104,37 @@ const Post: React.FC<PostProps> = ({
     const API_URL = "http://localhost:5000/";
     return `${API_URL}${url}`;
   };
+
+  const handleProfileClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Empêche d'ouvrir le post en même temps
+    navigate(`/profile/${user.id}`);
+  };
+
+  // Fonction pour rediriger vers la page du post
+  const handlePostClick = () => {
+    if (id) {
+      navigate(`/post/${id}`);
+    }
+  };
+  console.log(user)
   return (
       <div
           className="bg-[var(--bg-secondary)] border border-gray-700 rounded-lg p-4 cursor-pointer hover:bg-opacity-80 transition-all"
           onClick={handlePostClick}
       >
         <div className="flex space-x-4">
-          <AvatarPlaceholder src={user.profilePicture} size="w-16 h-16" />
+          <div onClick={handleProfileClick} className="cursor-pointer">
+            <AvatarPlaceholder src={user.avatar} size="w-16 h-16" />
+          </div>
+
           <div className="flex-1">
             <div className="flex items-center space-x-2">
-              <span className="font-bold text-[var(--text-primary)]">{user.name}</span>
-              <span className="text-gray-500 text-sm">@{user.username} · {time}</span>
+            <span className="font-bold text-[var(--text-primary)]">
+              {user.username}
+            </span>
+              <span className="text-gray-500 text-sm">
+              @{user.username} · {time}
+            </span>
             </div>
             <p className="text-[var(--text-primary)] mt-2">{content}</p>
 
@@ -133,7 +147,7 @@ const Post: React.FC<PostProps> = ({
                         <div key={index} className="overflow-hidden rounded-lg border border-gray-600">
                           {isVideo(fullUrl) ? (
                               <video controls className="w-full h-auto rounded-lg">
-                                <source src={fullUrl} type={`video/${fullUrl.split('.').pop()}`} />
+                                <source src={fullUrl} type={`video/${fullUrl.split('.').pop()}`}/>
                                 Votre navigateur ne supporte pas la lecture de vidéos.
                               </video>
                           ) : (
@@ -153,18 +167,21 @@ const Post: React.FC<PostProps> = ({
             {/* Icônes d'interaction */}
             <div className="flex justify-between text-gray-500 mt-3 text-sm">
               <div className="flex items-center space-x-2 cursor-pointer hover:text-[var(--accent)]">
-                <MessageCircle size={18} /> <span>{comments}</span>
+                <MessageCircle size={18}/> <span>{comments}</span>
               </div>
-              <div className="flex items-center space-x-2 cursor-pointer hover:text-[var(--accent)]" onClick={handleRepostClick}>
-                <Repeat2 size={18} className={isRepostedState ? "text-[var(--accent)]" : ""} />
+              <div className="flex items-center space-x-2 cursor-pointer hover:text-[var(--accent)]"
+                   onClick={handleRepostClick}>
+                <Repeat2 size={18} className={isRepostedState ? "text-[var(--accent)]" : ""}/>
                 <span>{sharesCount}</span>
               </div>
-              <div className="flex items-center space-x-2 cursor-pointer hover:text-[var(--accent)]" onClick={handleFavoriteClick}>
-                <Heart size={18} className={isLikedState ? "text-red-500" : ""} />
+              <div className="flex items-center space-x-2 cursor-pointer hover:text-[var(--accent)]"
+                   onClick={handleFavoriteClick}>
+                <Heart size={18} className={isLikedState ? "text-red-500" : ""}/>
                 <span>{likeCount}</span>
               </div>
-              <div className="flex items-center space-x-2 cursor-pointer hover:text-[var(--accent)]" onClick={handleSignetClick}>
-                <Bookmark size={18} className={isSignetedState ? "text-[var(--accent)]" : ""} />
+              <div className="flex items-center space-x-2 cursor-pointer hover:text-[var(--accent)]"
+                   onClick={handleSignetClick}>
+                <Bookmark size={18} className={isSignetedState ? "text-[var(--accent)]" : ""}/>
                 <span>{signetsCount}</span>
               </div>
             </div>

@@ -43,8 +43,8 @@ export default function Accueil() {
       const formattedPost = {
         id: post._id,
         user: {
-          avatar: post.userId.profileImage || "https://via.placeholder.com/50",
-          name: post.userId.username,
+          id: post.userId._id,
+          avatar: post.userId.profilePicture,
           username: post.userId.username,
         },
         content: post.content,
