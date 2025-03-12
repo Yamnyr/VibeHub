@@ -1,5 +1,4 @@
 const Post = require('../models/Post');
-const io = require('../utils/socket'); // Chemin vers votre configuration Socket.IO
 
 
 exports.createPost = async (req, res) => {
@@ -162,18 +161,18 @@ exports.toggleFavorite = async (req, res) => {
             isLiked = true;
 
             // Ajouter une notification
-            const notification = {
-                userId: post.userId._id,
-                type: "like",
-                message: `${req.user.username} a aimé votre post`,
-                isRead: false,
-                createdAt: new Date(),
-            };
+            // const notification = {
+            //     userId: post.userId._id,
+            //     type: "like",
+            //     message: `${req.user.username} a aimé votre post`,
+            //     isRead: false,
+            //     createdAt: new Date(),
+            // };
 
-            await Notification.create(notification);
+            // await Notification.create(notification);
 
-            // Émettre la notification en temps réel
-            io.emit("receive-notification", notification);
+            // // Émettre la notification en temps réel
+            // io.emit("receive-notification", notification);
         }
 
         // Mettre à jour le compteur de likes

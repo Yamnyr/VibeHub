@@ -9,7 +9,9 @@ const postRoutes = require('./routes/postRoutes');
 const feedRoutes = require('./routes/feedRoutes');
 const connectDB = require("./config/db");
 const {join} = require("path");
+const http = require("http");
 const { Server } = require('socket.io');
+
 
 dotenv.config();
 const app = express();
@@ -27,6 +29,28 @@ app.use('/api/', feedRoutes);
 app.use("/uploads", express.static(join(__dirname, "uploads")));
 app.get("/", (req, res) => {
     res.send("Bienvenue sur l'API VibaeHub Clone !");
+});
+
+const server = http.createServer(app); 
+const io = new Server(server, {
+    cors: {
+        origin: "http://localhost:5173",
+        methods: ["GET", "POST"]
+    }
+});
+
+io.on("connection", (socket) => {
+    console.log("Un utilisateur est connecté :", socket.id);
+
+    socket.on("sendMessage", (message) => {
+        console.log("Message reçu :", message);
+
+        io.emit("receiveMessage", message);
+    });
+
+    socket.on("disconnect", () => {
+        console.log("Un utilisateur s'est déconnecté :", socket.id);
+    });
 });
 
 connectDB()
