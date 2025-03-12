@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Heart, MessageCircle, Repeat2 } from "lucide-react";
 import PostService from "../services/postService";
 import { useNavigate } from "react-router-dom";
+import AvatarPlaceholder from "./Avatar.tsx";
 
 interface PostUser {
   avatar: string;
@@ -89,14 +90,14 @@ const Post: React.FC<PostProps> = ({
     const API_URL = "http://localhost:5000/";
     return `${API_URL}${url}`;
   };
-
+  console.log(user)
   return (
       <div
           className="bg-[var(--bg-secondary)] border border-gray-700 rounded-lg p-4 cursor-pointer hover:bg-opacity-80 transition-all"
           onClick={handlePostClick}
       >
         <div className="flex space-x-4">
-          <img src={user.avatar || "/placeholder.svg"} alt={user.name} className="w-12 h-12 rounded-full" />
+          <AvatarPlaceholder src={user.profilePicture} size="w-16 h-16" />
           <div className="flex-1">
             <div className="flex items-center space-x-2">
               <span className="font-bold text-[var(--text-primary)]">{user.name}</span>

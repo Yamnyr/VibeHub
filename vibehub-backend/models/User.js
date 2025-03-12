@@ -9,7 +9,8 @@ const UserSchema = new mongoose.Schema({
     bio: { type: String, default: '' },
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // ✅ Ajout des followers
     following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    createdAt: { type: Date, default: Date.now }
+    createdAt: { type: Date, default: Date.now },
+    notificationIsActive: { type: Boolean, default: true }
 });
 
 module.exports = mongoose.model('User', UserSchema);
