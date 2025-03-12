@@ -6,7 +6,7 @@ const UserProfile = () => {
   const { user } = useAuth();
 
   // ✅ Debugging pour voir si les données sont bien récupérées
-  console.log("User dans UserProfile:", user);
+  // console.log("User dans UserProfile:", user);
 
   // ✅ Vérification si `user` est null ou non défini
   if (!user) {

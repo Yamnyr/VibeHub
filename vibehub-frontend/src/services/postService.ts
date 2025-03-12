@@ -28,24 +28,22 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api"
 // Service pour les posts
 const PostService = {
     // Créer un nouveau post
-    createPost: async (content: string, parentId?: string): Promise<Post> => {
+    createPost: async (formData: FormData): Promise<Post> => {
         try {
-            const token = localStorage.getItem("token")
-            const response = await axios.post(
-                `${API_URL}/posts`,
-                { content, parentId },
-                {
-                    headers: {
-                        Authorization: token ? `Bearer ${token}` : "",
-                    } as AxiosRequestConfig["headers"],
-                },
-            )
-            return response.data.post
+            const token = localStorage.getItem("token");
+            const response = await axios.post(`${API_URL}/posts`, formData, {
+                headers: {
+                    Authorization: token ? `Bearer ${token}` : "",
+                    "Content-Type": "multipart/form-data",
+                } as AxiosRequestConfig["headers"],
+            });
+            return response.data.post;
         } catch (error) {
-            console.error("Erreur lors de la création du post:", error)
-            throw error
+            console.error("Erreur lors de la création du post:", error);
+            throw error;
         }
     },
+
 
     // Récupérer un post par son ID
     getPostById: async (postId: string): Promise<Post> => {

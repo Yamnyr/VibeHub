@@ -10,24 +10,31 @@ const CreatePost = ({ onPostCreated, parentId }: CreatePostProps) => {
     const [content, setContent] = useState<string>("");
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
-
+    const [files, setFiles] = useState<FileList | null>(null);
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            setFiles(e.target.files);
+        }
+    };
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
-        if (!content.trim()) return;
+        if (!content.trim() && !files) return;
 
         setIsSubmitting(true);
         setError(null);
 
         try {
-            if (parentId) {
-                await PostService.createComment(parentId, content);
-            } else {
-                await PostService.createPost(content);
+            const formData = new FormData();
+            formData.append("content", content);
+            if (parentId) formData.append("parentId", parentId);
+            if (files) {
+                Array.from(files).forEach(file => formData.append("media", file));
             }
 
+            await PostService.createPost(formData);
             setContent("");
-            onPostCreated(); // Notifier le composant parent pour recharger le feed
+            setFiles(null);
+            onPostCreated();
         } catch (error: any) {
             console.error("Erreur lors de la création du post:", error);
             setError(error.response?.data?.message || "Impossible de publier votre message. Veuillez réessayer.");
@@ -35,7 +42,6 @@ const CreatePost = ({ onPostCreated, parentId }: CreatePostProps) => {
             setIsSubmitting(false);
         }
     };
-
     const placeholderText = parentId
         ? "Écrivez votre commentaire..."
         : "Quoi de neuf ?";
@@ -55,6 +61,13 @@ const CreatePost = ({ onPostCreated, parentId }: CreatePostProps) => {
             onChange={(e) => setContent(e.target.value)}
             disabled={isSubmitting}
         />
+                <input
+                    type="file"
+                    multiple
+                    accept="image/*,video/*"
+                    onChange={handleFileChange}
+                    className="mt-2 text-white"
+                />
 
                 {error && (
                     <div className="mt-2 text-red-500 text-sm">{error}</div>

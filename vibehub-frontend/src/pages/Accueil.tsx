@@ -25,15 +25,6 @@ export default function Accueil() {
         fetchedPosts = await FeedService.getGlobalFeed();
       }
 
-      // Afficher l'état isLiked pour chaque post dans la console
-      console.log("Posts récupérés:", fetchedPosts.map(post => ({
-        id: post._id,
-        username: post.userId.username,
-        content: post.content.substring(0, 20) + "...",
-        isLiked: post.isLiked,
-        likesCount: post.likesCount
-      })));
-
       setPosts(fetchedPosts);
     } catch (error) {
       console.error("Erreur lors du chargement du feed:", error);
@@ -63,10 +54,8 @@ export default function Accueil() {
         shares: post.repostsCount || 0,
         isLiked: post.isLiked,
         isReposted: post.isReposted,
+        media: post.media || [], // Inclure les médias du post
       };
-
-      // Log de débogage pour chaque post formaté
-      console.log(`Post formaté: ${formattedPost.id} - isLiked: ${formattedPost.isLiked}`);
 
       return formattedPost;
     });

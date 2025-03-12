@@ -2,31 +2,30 @@ const Post = require('../models/Post');
 
 exports.createPost = async (req, res) => {
     try {
-        const { content, media, hashtags, parentId } = req.body;
+        const { content, hashtags, parentId } = req.body;
         const userId = req.userId;
-        // const flaskResponse = await fetch("http://vibehub-ia:5001/moderate", {
-        //     method: "POST",
-        //     headers: { "Content-Type": "application/json" },
-        //     body: JSON.stringify({ content }),
-        // });
-        //
-        // const flaskData = await flaskResponse.json();
-        // console.log(flaskData);
-        // if (flaskData.IsToxic === true) {
-        //     return res.status(400).json({ message: "Contenu inapproprié" });
-        // }
-        
+        const media = req.files.map(file => `assets/uploads/${file.filename}`); // Générer les URLs des fichiers
+        const flaskResponse = await fetch("http://vibehub-ia:5001/moderate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ content }),
+        });
+
+        const flaskData = await flaskResponse.json();
+        console.log(flaskData);
+        if (flaskData.IsToxic === true) {
+            return res.status(400).json({ message: "Contenu inapproprié" });
+        }
         const newPost = new Post({
             userId,
             content,
             media,
             hashtags,
-            parentId // Peut être null (post principal) ou l'ID d'un post parent (commentaire)
+            parentId
         });
 
         await newPost.save();
 
-        // Si c'est un commentaire, mettre à jour le compteur de commentaires du post parent
         if (parentId) {
             await Post.findByIdAndUpdate(parentId, { $inc: { commentsCount: 1 } });
         }

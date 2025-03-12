@@ -19,28 +19,35 @@ interface PostProps {
   shares?: number;
   isLiked?: boolean;
   isReposted?: boolean;
+  media?: string[]; // Liste des URL des médias
 }
 
 const Post: React.FC<PostProps> = ({
-  id,
-  user,
-  content,
-  time,
-  comments = 0,
-  likes = 0,
-  shares = 0,
-  isLiked = false,
-  isReposted = false,
-}) => {
+                                     id,
+                                     user,
+                                     content,
+                                     time,
+                                     comments = 0,
+                                     likes = 0,
+                                     shares = 0,
+                                     isLiked = false,
+                                     isReposted = false,
+                                     media = [],
+                                   }) => {
   const navigate = useNavigate();
   const [isLikedState, setIsLikedState] = useState(isLiked);
   const [isRepostedState, setIsRepostedState] = useState(isReposted);
   const [likeCount, setLikeCount] = useState(likes);
   const [sharesCount, setSharesCount] = useState(shares);
 
-  const handleFavoriteClick = async (e: React.MouseEvent) => {
-    e.stopPropagation(); // Empêche la propagation au parent (navigation)
+  // Fonction pour déterminer si un média est une vidéo
+  const isVideo = (url: string) => {
+    const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi'];
+    return videoExtensions.some(ext => url.toLowerCase().endsWith(ext));
+  };
 
+  const handleFavoriteClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     try {
       if (id) {
         await PostService.toggleFavorite(id);
@@ -53,8 +60,7 @@ const Post: React.FC<PostProps> = ({
   };
 
   const handleRepostClick = async (e: React.MouseEvent) => {
-    e.stopPropagation(); // Empêche la propagation au parent (navigation)
-
+    e.stopPropagation();
     try {
       if (id) {
         await PostService.toggleRepost(id);
@@ -72,51 +78,73 @@ const Post: React.FC<PostProps> = ({
     }
   };
 
-  return (
-    <div
-      className="bg-[var(--bg-secondary)] border border-gray-700 rounded-lg p-4 cursor-pointer hover:bg-opacity-80 transition-all"
-      onClick={handlePostClick}
-    >
-      <div className="flex space-x-4">
-        <img src={user.avatar || "/placeholder.svg"} alt={user.name} className="w-12 h-12 rounded-full" />
-        <div className="flex-1">
-          <div className="flex items-center space-x-2">
-            <span className="font-bold text-[var(--text-primary)]">{user.name}</span>
-            <span className="text-gray-500 text-sm">
-              @{user.username} · {time}
-            </span>
-          </div>
-          <p className="text-[var(--text-primary)] mt-2">{content}</p>
+  // Fonction pour obtenir l'URL complète d'un média
+  const getMediaUrl = (url: string) => {
+    // Si l'URL est relative, préfixer avec l'URL de l'API
+    if (url.startsWith('/')) {
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+      return `${API_URL}${url}`;
+    }
+    return url;
+  };
 
-          {/* Icônes d'interaction */}
-          <div className="flex justify-between text-gray-500 mt-3 text-sm">
-            <div className="flex items-center space-x-2 cursor-pointer hover:text-[var(--accent)]">
-              <MessageCircle size={18} /> <span>{comments}</span>
+  return (
+      <div
+          className="bg-[var(--bg-secondary)] border border-gray-700 rounded-lg p-4 cursor-pointer hover:bg-opacity-80 transition-all"
+          onClick={handlePostClick}
+      >
+        <div className="flex space-x-4">
+          <img src={user.avatar || "/placeholder.svg"} alt={user.name} className="w-12 h-12 rounded-full" />
+          <div className="flex-1">
+            <div className="flex items-center space-x-2">
+              <span className="font-bold text-[var(--text-primary)]">{user.name}</span>
+              <span className="text-gray-500 text-sm">@{user.username} · {time}</span>
             </div>
-            <div
-              className="flex items-center space-x-2 cursor-pointer hover:text-[var(--accent)]"
-              onClick={handleRepostClick}
-            >
-              <Repeat2
-                size={18}
-                className={isRepostedState ? "text-[var(--accent)]" : ""}
-              />
-              <span>{sharesCount}</span>
-            </div>
-            <div
-              className="flex items-center space-x-2 cursor-pointer hover:text-[var(--accent)]"
-              onClick={handleFavoriteClick}
-            >
-              <Heart
-                size={18}
-                className={isLikedState ? "text-red-500" : ""}
-              />
-              <span>{likeCount}</span>
+            <p className="text-[var(--text-primary)] mt-2">{content}</p>
+
+            {/* Affichage des médias */}
+            {media && media.length > 0 && (
+                <div className={`grid gap-2 mt-3 ${media.length > 1 ? "grid-cols-2" : "grid-cols-1"}`}>
+                  {media.map((url, index) => {
+                    const fullUrl = getMediaUrl(url);
+                    return (
+                        <div key={index} className="overflow-hidden rounded-lg border border-gray-600">
+                          {isVideo(fullUrl) ? (
+                              <video controls className="w-full h-auto rounded-lg">
+                                <source src={fullUrl} type={`video/${fullUrl.split('.').pop()}`} />
+                                Votre navigateur ne supporte pas la lecture de vidéos.
+                              </video>
+                          ) : (
+                              <img
+                                  src={fullUrl}
+                                  alt={`media-${index}`}
+                                  className="w-full h-auto object-cover max-h-80"
+                                  onClick={(e) => e.stopPropagation()}
+                              />
+                          )}
+                        </div>
+                    );
+                  })}
+                </div>
+            )}
+
+            {/* Icônes d'interaction */}
+            <div className="flex justify-between text-gray-500 mt-3 text-sm">
+              <div className="flex items-center space-x-2 cursor-pointer hover:text-[var(--accent)]">
+                <MessageCircle size={18} /> <span>{comments}</span>
+              </div>
+              <div className="flex items-center space-x-2 cursor-pointer hover:text-[var(--accent)]" onClick={handleRepostClick}>
+                <Repeat2 size={18} className={isRepostedState ? "text-[var(--accent)]" : ""} />
+                <span>{sharesCount}</span>
+              </div>
+              <div className="flex items-center space-x-2 cursor-pointer hover:text-[var(--accent)]" onClick={handleFavoriteClick}>
+                <Heart size={18} className={isLikedState ? "text-red-500" : ""} />
+                <span>{likeCount}</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
   );
 };
 

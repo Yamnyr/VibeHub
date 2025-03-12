@@ -7,7 +7,7 @@ export interface PostComment {
     text: string;
 }
 
-// Mise à jour de l'interface Post pour tenir compte des likes et reposts en tant que tableaux d'IDs
+// Mise à jour de l'interface Post pour inclure les médias
 export interface Post {
     _id: string;
     userId: {
@@ -25,6 +25,8 @@ export interface Post {
     reposts: string[];      // Liste des IDs des utilisateurs qui ont reposté
     isLiked: boolean;       // Indique si l'utilisateur actuel a liké le post
     isReposted: boolean;    // Indique si l'utilisateur actuel a reposté le post
+    media: string[];        // Liste des URLs des médias associés au post
+    signetsCount: number;   // Nombre de signets
 }
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
@@ -62,13 +64,13 @@ export const FeedService = {
             const response = await axios.get(`${API_URL}/feed/global`);
 
             // Ajouter isLiked et isReposted pour chaque post en fonction de l'utilisateur connecté
-            const userId = localStorage.getItem("userId"); // Assurez-vous que l'ID de l'utilisateur est stocké
+            const userId = localStorage.getItem("userId");
             const posts = response.data.map((post: Post) => ({
                 ...post,
-                // isLiked: post.likes.includes(userId ?? ""),  // Vérifier si l'utilisateur a liké
-                // isReposted: post.reposts.includes(userId ?? ""), // Vérifier si l'utilisateur a reposté
+                isLiked: post.likes?.includes(userId ?? "") || false,
+                isReposted: post.reposts?.includes(userId ?? "") || false,
             }));
-            console.log(posts)
+
             return posts;
         } catch (error) {
             console.error("Erreur lors de la récupération du feed global:", error);
@@ -77,19 +79,44 @@ export const FeedService = {
     },
 
     // Créer un nouveau post
-    createPost: async (content: string): Promise<Post> => {
+    createPost: async (content: string, mediaFiles?: File[]): Promise<Post> => {
         try {
             const token = localStorage.getItem("token");
-            const response = await axios.post(
-                `${API_URL}/posts`,
-                { content },
-                {
-                    headers: {
-                        'Authorization': token ? `Bearer ${token}` : '',
-                    } as AxiosRequestConfig['headers'],
-                }
-            );
-            return response.data;
+
+            // Si des fichiers média sont fournis, utilisez FormData pour l'upload
+            if (mediaFiles && mediaFiles.length > 0) {
+                const formData = new FormData();
+                formData.append("content", content);
+
+                // Ajouter chaque fichier média au formData
+                mediaFiles.forEach(file => {
+                    formData.append("media", file);
+                });
+
+                const response = await axios.post(
+                    `${API_URL}/posts`,
+                    formData,
+                    {
+                        headers: {
+                            'Authorization': token ? `Bearer ${token}` : '',
+                            'Content-Type': 'multipart/form-data'
+                        } as AxiosRequestConfig['headers'],
+                    }
+                );
+                return response.data;
+            } else {
+                // Si pas de média, envoyer simplement le contenu
+                const response = await axios.post(
+                    `${API_URL}/posts`,
+                    { content },
+                    {
+                        headers: {
+                            'Authorization': token ? `Bearer ${token}` : '',
+                        } as AxiosRequestConfig['headers'],
+                    }
+                );
+                return response.data;
+            }
         } catch (error) {
             console.error("Erreur lors de la création du post:", error);
             throw error;
