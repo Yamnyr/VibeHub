@@ -5,7 +5,7 @@ exports.createPost = async (req, res) => {
     try {
         const { content, hashtags, parentId } = req.body;
         const userId = req.userId;
-        const media = req.files.map(file => `assets/uploads/${file.filename}`); // Générer les URLs des fichiers
+        const media = req.files.map(file => `uploads/${file.filename}`); // Générer les URLs des fichiers
         const flaskResponse = await fetch("http://vibehub-ia:5001/moderate", {
             method: "POST",
             headers: { "Content-Type": "application/json" },

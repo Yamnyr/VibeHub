@@ -80,12 +80,14 @@ const Post: React.FC<PostProps> = ({
 
   // Fonction pour obtenir l'URL complète d'un média
   const getMediaUrl = (url: string) => {
-    // Si l'URL est relative, préfixer avec l'URL de l'API
-    if (url.startsWith('/')) {
-      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-      return `${API_URL}${url}`;
+    // Si l'URL est déjà absolue, ne pas la modifier
+    if (url.startsWith('http') || url.startsWith('https')) {
+      return url;
     }
-    return url;
+
+    // Si l'URL est relative, préfixer avec l'URL de l'API
+    const API_URL = "http://localhost:5000/";
+    return `${API_URL}${url}`;
   };
 
   return (
@@ -107,6 +109,7 @@ const Post: React.FC<PostProps> = ({
                 <div className={`grid gap-2 mt-3 ${media.length > 1 ? "grid-cols-2" : "grid-cols-1"}`}>
                   {media.map((url, index) => {
                     const fullUrl = getMediaUrl(url);
+                    console.log(fullUrl)
                     return (
                         <div key={index} className="overflow-hidden rounded-lg border border-gray-600">
                           {isVideo(fullUrl) ? (
