@@ -1,4 +1,6 @@
 const Post = require('../models/Post');
+const io = require('../utils/socket'); // Chemin vers votre configuration Socket.IO
+
 
 exports.createPost = async (req, res) => {
     try {
