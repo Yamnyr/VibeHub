@@ -17,13 +17,24 @@ export default function Accueil() {
   const loadFeed = async () => {
     setIsLoading(true);
     try {
+      let fetchedPosts: PostType[] = [];
+
       if (feedType === "personal" && isAuthenticated) {
-        const userPosts = await FeedService.getUserFeed();
-        setPosts(userPosts);
+        fetchedPosts = await FeedService.getUserFeed();
       } else {
-        const globalPosts = await FeedService.getGlobalFeed();
-        setPosts(globalPosts);
+        fetchedPosts = await FeedService.getGlobalFeed();
       }
+
+      // Afficher l'état isLiked pour chaque post dans la console
+      console.log("Posts récupérés:", fetchedPosts.map(post => ({
+        id: post._id,
+        username: post.userId.username,
+        content: post.content.substring(0, 20) + "...",
+        isLiked: post.isLiked,
+        likesCount: post.likesCount
+      })));
+
+      setPosts(fetchedPosts);
     } catch (error) {
       console.error("Erreur lors du chargement du feed:", error);
     } finally {
@@ -37,21 +48,28 @@ export default function Accueil() {
 
   // Formatage des données pour correspondre à l'interface du composant Post
   const formatPosts = (posts: PostType[]) => {
-    return posts.map(post => ({
-      id: post._id,
-      user: {
-        avatar: post.userId.profileImage || "https://via.placeholder.com/50",
-        name: post.userId.username,
-        username: post.userId.username,
-      },
-      content: post.content,
-      time: formatTime(new Date(post.createdAt)),
-      comments: post.commentsCount || 0,
-      likes: post.likesCount || 0,
-      shares: post.repostsCount || 0,
-      isLiked: post.isLiked, // Ajout de l'état like
-      isReposted: post.isReposted, // Ajout de l'état repost
-    }));
+    return posts.map(post => {
+      const formattedPost = {
+        id: post._id,
+        user: {
+          avatar: post.userId.profileImage || "https://via.placeholder.com/50",
+          name: post.userId.username,
+          username: post.userId.username,
+        },
+        content: post.content,
+        time: formatTime(new Date(post.createdAt)),
+        comments: post.commentsCount || 0,
+        likes: post.likesCount || 0,
+        shares: post.repostsCount || 0,
+        isLiked: post.isLiked,
+        isReposted: post.isReposted,
+      };
+
+      // Log de débogage pour chaque post formaté
+      console.log(`Post formaté: ${formattedPost.id} - isLiked: ${formattedPost.isLiked}`);
+
+      return formattedPost;
+    });
   };
 
   // Fonction pour formater le temps (ex: "il y a 2h")

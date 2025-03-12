@@ -39,10 +39,16 @@ exports.createPost = async (req, res) => {
 
 exports.getPostById = async (req, res) => {
     try {
-        const post = await Post.findById(req.params.id).populate('userId', 'username profilePicture');
+        const userId = req.userId;
+        const post = await Post.findById(req.params.id).populate('userId', 'username profilePicture').lean();
+
         if (!post) {
             return res.status(404).json({ message: "Post non trouvé" });
         }
+
+        post.isLiked = post.likes.some(like => like.toString() === userId.toString()); // Vérifie si l'utilisateur a liké le post
+        post.isReposted = post.reposts.some(repost => repost.toString() === userId.toString()); // Vérifie si l'utilisateur a reposté le post
+
         res.status(200).json(post);
     } catch (error) {
         res.status(500).json({ message: "Erreur lors de la récupération du post", error });
