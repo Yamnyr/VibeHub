@@ -1,6 +1,6 @@
 const Notification = require("../models/Notification")
-const Like = require("../models/Like")
-const Repost = require("../models/Repost")
+// const Like = require("../models/Like")
+// const Repost = require("../models/Repost")
 const Follow = require("../models/Follow")
 const Post = require("../models/Post")
 

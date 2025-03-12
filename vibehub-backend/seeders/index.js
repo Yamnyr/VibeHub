@@ -35,8 +35,8 @@ const seedDatabase = async () => {
         console.log(`✅ Created ${follows.length} follows`)
 
         // 8. Create notifications based on interactions
-        const notifications = await notificationSeeder.seed(users)
-        console.log(`✅ Created ${notifications.length} notifications`)
+        // const notifications = await notificationSeeder.seed(users)
+        // console.log(`✅ Created ${notifications.length} notifications`)
 
         console.log("✅ Seeding completed successfully!")
 
