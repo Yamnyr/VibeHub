@@ -19,7 +19,6 @@ router.put('/profile', authMiddleware, userController.updateProfile);
 router.get('/signets', authMiddleware, userController.getUserSignets);
 router.post('/:id/follow', authMiddleware, userController.followUser);
 router.delete('/:id/follow', authMiddleware, userController.unfollowUser);
-router.get('/:id/likes', authMiddleware, userController.getUserLikes);
 router.get('/:id/reposts', authMiddleware, userController.getUserPosts);
 router.get('/search', authMiddleware, userController.searchUsers);
 

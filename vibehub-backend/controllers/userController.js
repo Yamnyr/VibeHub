@@ -1,7 +1,5 @@
 const User = require('../models/User');
 const Post = require('../models/Post'); // Notez que le modèle s'appelle Post mais représente les posts
-const Like = require('../models/Like');
-const Repost = require('../models/Repost');
 const Follow = require('../models/Follow');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -147,7 +145,17 @@ exports.getUserById = async (req, res) => {
             return res.status(404).json({ error: 'Utilisateur non trouvé' });
         }
 
-        res.status(200).json(user);
+        // Récupérer les posts likés, enregistrés et repostés depuis la collection Post
+        const likedPosts = await Post.find({ likes: user._id });
+        const savedPosts = await Post.find({ signets: user._id });
+        const repostedPosts = await Post.find({ reposts: user._id });
+
+        res.status(200).json({
+            ...user.toObject(),
+            likedPosts,
+            savedPosts,
+            repostedPosts
+        });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Erreur lors de la récupération du profil' });
@@ -200,47 +208,6 @@ exports.getUserPosts = async (req, res) => {
     }
 };
 
-// Obtenir tous les posts likés par un utilisateur
-exports.getUserLikes = async (req, res) => {
-    try {
-        const likes = await Like.find({ userId: req.params.id })
-            .sort({ createdAt: -1 })
-            .populate({
-                path: 'postId',
-                populate: {
-                    path: 'userId',
-                    select: 'username profilePicture'
-                }
-            });
-
-        const likedPosts = likes.map(like => like.postId);
-        res.status(200).json(likedPosts);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Erreur lors de la récupération des posts likés' });
-    }
-};
-
-// Obtenir tous les reposts d'un utilisateur
-exports.getUserReposts = async (req, res) => {
-    try {
-        const reposts = await Repost.find({ userId: req.params.id })
-            .sort({ createdAt: -1 })
-            .populate({
-                path: 'postId',
-                populate: {
-                    path: 'userId',
-                    select: 'username profilePicture'
-                }
-            });
-
-        const repostedPosts = reposts.map(repost => repost.posttId);
-        res.status(200).json(repostedPosts);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Erreur lors de la récupération des reposts' });
-    }
-};
 
 // Obtenir tous les posts enregistrés par un utilisateur
 exports.getUserSignets = async (req, res) => {
