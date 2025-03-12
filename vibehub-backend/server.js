@@ -8,6 +8,7 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const postRoutes = require('./routes/postRoutes');
 const feedRoutes = require('./routes/feedRoutes');
 const connectDB = require("./config/db");
+const { Server } = require('socket.io');
 
 dotenv.config();
 const app = express();
