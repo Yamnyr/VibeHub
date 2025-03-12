@@ -67,10 +67,8 @@ export const FeedService = {
             const userId = localStorage.getItem("userId");
             const posts = response.data.map((post: Post) => ({
                 ...post,
-                isLiked: post.likes?.includes(userId ?? "") || false,
-                isReposted: post.reposts?.includes(userId ?? "") || false,
             }));
-
+            console.log(posts)
             return posts;
         } catch (error) {
             console.error("Erreur lors de la récupération du feed global:", error);

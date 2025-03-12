@@ -84,7 +84,15 @@ const PostDetail: React.FC = () => {
     if (!newComment.trim() || !id) return;
 
     try {
-      await PostService.createPost(newComment, id);
+      // Créer le FormData pour le commentaire
+      const formData = new FormData();
+      formData.append("content", newComment);
+      formData.append("parentId", id);
+
+      // Appel au service pour créer le commentaire
+      await PostService.createPost(formData);
+
+      // Réinitialiser le champ du commentaire
       setNewComment("");
 
       // Recharger les commentaires

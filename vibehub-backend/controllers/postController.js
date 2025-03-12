@@ -6,17 +6,17 @@ exports.createPost = async (req, res) => {
         const { content, hashtags, parentId } = req.body;
         const userId = req.userId;
         const media = req.files.map(file => `assets/uploads/${file.filename}`); // Générer les URLs des fichiers
-        const flaskResponse = await fetch("http://vibehub-ia:5001/moderate", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ content }),
-        });
-
-        const flaskData = await flaskResponse.json();
-        console.log(flaskData);
-        if (flaskData.IsToxic === true) {
-            return res.status(400).json({ message: "Contenu inapproprié" });
-        }
+        // const flaskResponse = await fetch("http://vibehub-ia:5001/moderate", {
+        //     method: "POST",
+        //     headers: { "Content-Type": "application/json" },
+        //     body: JSON.stringify({ content }),
+        // });
+        //
+        // const flaskData = await flaskResponse.json();
+        // console.log(flaskData);
+        // if (flaskData.IsToxic === true) {
+        //     return res.status(400).json({ message: "Contenu inapproprié" });
+        // }
         const newPost = new Post({
             userId,
             content,
@@ -203,19 +203,19 @@ exports.toggleRepost = async (req, res) => {
             post.reposts.push(userId); // Ajouter le repost
             isReposted = true;
 
-            // Ajouter une notification
-            const notification = {
-                userId: post.userId._id,
-                type: "repost",
-                message: `${req.user.username} a reposté votre post`,
-                isRead: false,
-                createdAt: new Date(),
-            };
-
-            await Notification.create(notification);
-
-            // Émettre la notification en temps réel
-            io.emit("receive-notification", notification);
+            // // Ajouter une notification
+            // const notification = {
+            //     userId: post.userId._id,
+            //     type: "repost",
+            //     message: `${req.user.username} a reposté votre post`,
+            //     isRead: false,
+            //     createdAt: new Date(),
+            // };
+            //
+            // await Notification.create(notification);
+            //
+            // // Émettre la notification en temps réel
+            // io.emit("receive-notification", notification);
         }
 
         // Mettre à jour le compteur de reposts
