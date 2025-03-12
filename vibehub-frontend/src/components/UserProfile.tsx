@@ -5,25 +5,25 @@ import AvatarPlaceholder from "../components/Avatar.tsx";
 const UserProfile = () => {
   const { user } = useAuth();
 
-  // ✅ Debugging pour voir si les données sont bien récupérées
-  // console.log("User dans UserProfile:", user);
-
   // ✅ Vérification si `user` est null ou non défini
   if (!user) {
     return <div className="text-center text-gray-500">Chargement...</div>;
   }
 
   return (
-    <div className="bg-secondary border-b-2 p-4">
-      <div className="flex flex-col text-center">
-        {/* Profil */}
-        <div className="flex items-center space-x-3 mb-3">
-          <AvatarPlaceholder />
-          <div className="text-left">
-            <h2 className="text-lg font-bold text-white">{user.username}</h2>
-            <p className="text-gray-400 text-sm">@{user.username}</p>
-          </div>
-        </div>
+<div className="bg-secondary border-b-2 p-3">
+        {/* ✅ Conteneur principal en colonne */}
+        <div className="flex flex-col items-center text-center">
+            
+            {/* ✅ Profil avec Avatar et Infos utilisateur */}
+            <div className="flex items-center space-x-4">
+                <AvatarPlaceholder src={user.profilePicture} size="w-16 h-16" />
+                {/* ✅ Informations utilisateur à droite */}
+                <div className="text-left">
+                    <h2 className="text-xl font-bold text-white">{user.username}</h2>
+                    <p className="text-gray-400 text-sm">@{user.username}</p>
+                </div>
+            </div>
 
         {/* Email */}
         <p className="text-sm text-gray-300 mb-4">{user.email}</p>

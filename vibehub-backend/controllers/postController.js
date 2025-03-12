@@ -145,26 +145,40 @@ exports.toggleFavorite = async (req, res) => {
     try {
         const postId = req.params.id;
         const userId = req.userId;
-        const post = await Post.findById(postId);
+        const post = await Post.findById(postId).populate("userId", "username");
 
         if (!post) {
             return res.status(404).json({ message: "Post non trouvé" });
         }
 
-        // Ajouter ou retirer un like
+        let isLiked;
         if (post.likes.includes(userId)) {
-            post.likes.pull(userId); // Si déjà liké, retirer le like
-            console.log("oui")
+            post.likes.pull(userId); // Retirer le like
+            isLiked = false;
         } else {
-            post.likes.push(userId); // Sinon, ajouter le like
-            console.log("non")
+            post.likes.push(userId); // Ajouter le like
+            isLiked = true;
+
+            // Ajouter une notification
+            const notification = {
+                userId: post.userId._id,
+                type: "like",
+                message: `${req.user.username} a aimé votre post`,
+                isRead: false,
+                createdAt: new Date(),
+            };
+
+            await Notification.create(notification);
+
+            // Émettre la notification en temps réel
+            io.emit("receive-notification", notification);
         }
 
         // Mettre à jour le compteur de likes
         post.likesCount = post.likes.length;
         await post.save();
 
-        res.status(200).json({ message: "Likes mis à jour", post });
+        res.status(200).json({ message: "Likes mis à jour", isLiked, post });
     } catch (error) {
         res.status(500).json({ message: "Erreur lors du toggle du favori", error });
     }
@@ -174,28 +188,45 @@ exports.toggleRepost = async (req, res) => {
     try {
         const postId = req.params.id;
         const userId = req.userId;
-        const post = await Post.findById(postId);
+        const post = await Post.findById(postId).populate("userId", "username");
 
         if (!post) {
             return res.status(404).json({ message: "Post non trouvé" });
         }
 
-        // Ajouter ou retirer un repost
+        let isReposted;
         if (post.reposts.includes(userId)) {
-            post.reposts.pull(userId); // Si déjà reposté, retirer le repost
+            post.reposts.pull(userId); // Retirer le repost
+            isReposted = false;
         } else {
-            post.reposts.push(userId); // Sinon, ajouter le repost
+            post.reposts.push(userId); // Ajouter le repost
+            isReposted = true;
+
+            // Ajouter une notification
+            const notification = {
+                userId: post.userId._id,
+                type: "repost",
+                message: `${req.user.username} a reposté votre post`,
+                isRead: false,
+                createdAt: new Date(),
+            };
+
+            await Notification.create(notification);
+
+            // Émettre la notification en temps réel
+            io.emit("receive-notification", notification);
         }
 
         // Mettre à jour le compteur de reposts
         post.repostsCount = post.reposts.length;
         await post.save();
 
-        res.status(200).json({ message: "Repost mis à jour", post });
+        res.status(200).json({ message: "Repost mis à jour", isReposted, post });
     } catch (error) {
         res.status(500).json({ message: "Erreur lors du repost", error });
     }
 };
+
 
 exports.toggleSignet = async (req, res) => {
     try {

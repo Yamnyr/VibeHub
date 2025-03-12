@@ -9,6 +9,7 @@ const postRoutes = require('./routes/postRoutes');
 const feedRoutes = require('./routes/feedRoutes');
 const connectDB = require("./config/db");
 const {join} = require("path");
+const { Server } = require('socket.io');
 
 dotenv.config();
 const app = express();
