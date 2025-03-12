@@ -23,8 +23,8 @@ exports.getUserFeed = async (req, res) => {
 
         // Ajouter si l'utilisateur a liké ou reposté le post
         posts.forEach(post => {
-            post.isLiked = post.likes.includes(userId.toString()); // Vérifie si l'utilisateur a liké le post
-            post.isReposted = post.reposts.includes(userId.toString()); // Vérifie si l'utilisateur a reposté le post
+            post.isLiked = post.likes.some(like => like.toString() === userId.toString()); // Vérifie si l'utilisateur a liké le post
+            post.isReposted = post.reposts.some(repost => repost.toString() === userId.toString()); // Vérifie si l'utilisateur a reposté le post
         });
 
         res.status(200).json(posts);

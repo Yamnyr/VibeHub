@@ -109,7 +109,6 @@ const Post: React.FC<PostProps> = ({
                 <div className={`grid gap-2 mt-3 ${media.length > 1 ? "grid-cols-2" : "grid-cols-1"}`}>
                   {media.map((url, index) => {
                     const fullUrl = getMediaUrl(url);
-                    console.log(fullUrl)
                     return (
                         <div key={index} className="overflow-hidden rounded-lg border border-gray-600">
                           {isVideo(fullUrl) ? (
