@@ -191,3 +191,44 @@ exports.toggleRepost = async (req, res) => {
         res.status(500).json({ message: "Erreur lors du repost", error });
     }
 };
+
+exports.toggleSignet = async (req, res) => {
+    try {
+        const postId = req.params.id;
+        const userId = req.userId;
+        const post = await Post.findById(postId);
+
+        if (!post) {
+            return res.status(404).json({ message: "Post non trouvé" });
+        }
+
+        // Ajouter ou retirer le signet
+        if (post.signets.includes(userId)) {
+            post.signets.pull(userId); // Si déjà en signet, retirer
+        } else {
+            post.signets.push(userId); // Sinon, ajouter en signet
+        }
+
+        // Mettre à jour le compteur de signets
+        post.signetsCount = post.signets.length;
+        await post.save();
+
+        res.status(200).json({ message: "Signet mis à jour", post });
+    } catch (error) {
+        res.status(500).json({ message: "Erreur lors du toggle du signet", error });
+    }
+};
+
+exports.getPostSignets = async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id).populate('signets', 'username profilePicture');
+
+        if (!post) {
+            return res.status(404).json({ message: "Post non trouvé" });
+        }
+
+        res.status(200).json(post.signets); // Renvoie les utilisateurs ayant ajouté le post en signet
+    } catch (error) {
+        res.status(500).json({ message: "Erreur lors de la récupération des signets", error });
+    }
+};

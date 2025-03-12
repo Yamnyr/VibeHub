@@ -10,9 +10,11 @@ router.delete('/posts/:id', authMiddleware, postController.deletePost);
 router.get('/posts/:id/comments', authMiddleware, postController.getPostComments);
 router.get('/posts/:id/likes', authMiddleware, postController.getPostLikes);
 router.get('/posts/:id/reposts', authMiddleware, postController.getPostReposts);
+router.post('/posts/:id/signet', authMiddleware, postController.toggleSignet);
 
 // Nouvelle route pour gérer les likes et reposts
 router.post('/posts/:id/like', authMiddleware, postController.toggleFavorite);
 router.post('/posts/:id/repost', authMiddleware, postController.toggleRepost);
+router.get('/posts/:id/signets', authMiddleware, postController.getPostSignets);
 
 module.exports = router;
