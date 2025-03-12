@@ -24,6 +24,17 @@ services:
       - ./vibehub-backend:/app
       - /app/node_modules
 
+  # Service Flask API (Détection d’émotions et modération)
+  backend-ia:
+    build: ./vibehub-ia
+    container_name: vibehub-ia
+    restart: always
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./vibehub-ia:/app
+
+  # Service Frontend
   frontend:
     build: ./vibehub-frontend
     container_name: vibehub-frontend
@@ -35,6 +46,7 @@ services:
     environment:
       - NODE_ENV=development
       - REACT_APP_API_URL=http://localhost:5000
+      - REACT_APP_FLASK_API_URL=http://localhost:5001  # Ajout de l’URL de l’API Flask
     volumes:
       - ./vibehub-frontend:/app
       - /app/node_modules
