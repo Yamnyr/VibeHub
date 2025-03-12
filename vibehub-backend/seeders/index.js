@@ -3,7 +3,6 @@ const dotenv = require("dotenv")
 const userSeeder = require("./userSeeder")
 const postSeeder = require("./postSeeder")
 const followSeeder = require("./followSeeder")
-const signetSeeder = require("./signetSeeder")
 const hashtagSeeder = require("./hashtagSeeder")
 const notificationSeeder = require("./notificationSeeder")
 
@@ -34,10 +33,6 @@ const seedDatabase = async () => {
         // 5. Create follows between users
         const follows = await followSeeder.seed(users)
         console.log(`✅ Created ${follows.length} follows`)
-
-        // 7. Create bookmarks
-        const signets = await signetSeeder.seed(users, posts)
-        console.log(`✅ Created ${signets.length} bookmarks`)
 
         // 8. Create notifications based on interactions
         const notifications = await notificationSeeder.seed(users)

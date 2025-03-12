@@ -2,7 +2,6 @@ const User = require('../models/User');
 const Post = require('../models/Post'); // Notez que le modèle s'appelle Post mais représente les posts
 const Like = require('../models/Like');
 const Repost = require('../models/Repost');
-const Signet = require('../models/Signet');
 const Follow = require('../models/Follow');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
