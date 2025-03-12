@@ -23,8 +23,10 @@ export interface Post {
     repostsCount: number;   // Nombre de reposts
     likes: string[];        // Liste des IDs des utilisateurs qui ont liké
     reposts: string[];      // Liste des IDs des utilisateurs qui ont reposté
+    signets: string[] // Liste des IDs des utilisateurs ayant reposté
     isLiked: boolean;       // Indique si l'utilisateur actuel a liké le post
     isReposted: boolean;    // Indique si l'utilisateur actuel a reposté le post
+    isSigneted: boolean // Indique si l'utilisateur connecté a reposté
     media: string[];        // Liste des URLs des médias associés au post
     signetsCount: number;   // Nombre de signets
 }
@@ -66,7 +68,6 @@ export const FeedService = {
             const posts = response.data.map((post: Post) => ({
                 ...post,
             }));
-            console.log(posts)
             return posts;
         } catch (error) {
             console.error("Erreur lors de la récupération du feed global:", error);

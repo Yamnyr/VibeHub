@@ -48,6 +48,7 @@ exports.getPostById = async (req, res) => {
 
         post.isLiked = post.likes.some(like => like.toString() === userId.toString()); // Vérifie si l'utilisateur a liké le post
         post.isReposted = post.reposts.some(repost => repost.toString() === userId.toString()); // Vérifie si l'utilisateur a reposté le post
+        post.isSigneted = post.signets.some(signets => signets.toString() === userId.toString());
 
         res.status(200).json(post);
     } catch (error) {

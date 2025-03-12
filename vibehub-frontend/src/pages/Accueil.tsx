@@ -52,8 +52,10 @@ export default function Accueil() {
         comments: post.commentsCount || 0,
         likes: post.likesCount || 0,
         shares: post.repostsCount || 0,
+        signets: post.signetsCount || 0,
         isLiked: post.isLiked,
         isReposted: post.isReposted,
+        isSigneted: post.isSigneted,
         media: post.media || [], // Inclure les médias du post
       };
 

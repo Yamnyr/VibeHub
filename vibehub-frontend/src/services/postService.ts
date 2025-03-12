@@ -18,9 +18,11 @@ export interface Post {
     comments: number
     likes: string[]  // Liste des IDs des utilisateurs ayant liké
     reposts: string[] // Liste des IDs des utilisateurs ayant reposté
+    signets: string[] // Liste des IDs des utilisateurs ayant reposté
     parentId?: string
     isLiked?: boolean // Indique si l'utilisateur connecté a liké
     isReposted?: boolean // Indique si l'utilisateur connecté a reposté
+    isSigneted?: boolean // Indique si l'utilisateur connecté a reposté
 }
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api"
@@ -172,6 +174,20 @@ const PostService = {
             });
         } catch (error) {
             console.error(`Erreur lors du repost du post ${postId}:`, error);
+            throw error;
+        }
+    },
+    toggleSignet: async (postId: string): Promise<void> => {
+        try {
+            console.log("ajout signet")
+            const token = localStorage.getItem("token");
+            await axios.post(`${API_URL}/posts/${postId}/signet`, {}, {
+                headers: {
+                    Authorization: token ? `Bearer ${token}` : "",
+                } as AxiosRequestConfig["headers"],
+            });
+        } catch (error) {
+            console.error(`Erreur lors du toggle du signet du post ${postId}:`, error);
             throw error;
         }
     }

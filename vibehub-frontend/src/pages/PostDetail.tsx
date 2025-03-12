@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Heart, MessageCircle, Repeat2, ArrowLeft } from "lucide-react";
+import {Heart, MessageCircle, Repeat2, ArrowLeft, Bookmark} from "lucide-react";
 import PostService, { Post as PostType } from "../services/postService";
 
 interface Comment {
@@ -24,8 +24,10 @@ const PostDetail: React.FC = () => {
   const [newComment, setNewComment] = useState("");
   const [isLikedState, setIsLikedState] = useState(false);
   const [isRepostedState, setIsRepostedState] = useState(false);
+  const [isSignetedState, setIsSignetedState] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [shareCount, setShareCount] = useState(0);
+  const [signetsCount, setSignetsCount] = useState(0);
 
   useEffect(() => {
     if (!id) return;
@@ -37,8 +39,10 @@ const PostDetail: React.FC = () => {
         setPost(postData);
         setIsLikedState(postData.isLiked || false);
         setIsRepostedState(postData.isReposted || false);
+        setIsSignetedState(postData.isSigneted || false);
         setLikeCount(postData.likes?.length || 0);
         setShareCount(postData.reposts?.length || 0);
+        setSignetsCount(postData.signets?.length || 0);
 
         const commentsData = await PostService.getPostComments(id);
         setComments(commentsData);
@@ -75,6 +79,20 @@ const PostDetail: React.FC = () => {
       console.error("Erreur lors du toggle du repost :", error);
     }
   };
+
+  const handleSignetClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      if (id) {
+        await PostService.toggleSignet(id);
+        setIsSignetedState(!isSignetedState);
+        setSignetsCount(isSignetedState ? signetsCount - 1 : signetsCount + 1);
+      }
+    } catch (error) {
+      console.error("Erreur lors du toggle du signet :", error);
+    }
+  };
+
 
   const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -200,7 +218,7 @@ const PostDetail: React.FC = () => {
               {/* Icônes d'interaction */}
               <div className="flex justify-between text-gray-500 mt-3 text-sm">
                 <div className="flex items-center space-x-2 cursor-pointer hover:text-[var(--accent)]">
-                  <MessageCircle size={18} /> <span>{comments.length}</span>
+                  <MessageCircle size={18}/> <span>{comments.length}</span>
                 </div>
                 <div
                     className="flex items-center space-x-2 cursor-pointer hover:text-[var(--accent)]"
@@ -222,13 +240,19 @@ const PostDetail: React.FC = () => {
                   />
                   <span>{likeCount}</span>
                 </div>
+                <div className="flex items-center space-x-2 cursor-pointer hover:text-[var(--accent)]"
+                     onClick={handleSignetClick}>
+                  <Bookmark size={18} className={isSignetedState ? "text-[var(--accent)]" : ""}/>
+                  <span>{signetsCount}</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Formulaire de commentaire */}
-        <form onSubmit={handleCommentSubmit} className="mb-4 bg-[var(--bg-secondary)] border border-gray-700 rounded-lg p-4">
+        <form onSubmit={handleCommentSubmit}
+              className="mb-4 bg-[var(--bg-secondary)] border border-gray-700 rounded-lg p-4">
           <div className="flex">
             <input
                 type="text"

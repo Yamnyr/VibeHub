@@ -25,6 +25,7 @@ exports.getUserFeed = async (req, res) => {
         posts.forEach(post => {
             post.isLiked = post.likes.some(like => like.toString() === userId.toString()); // Vérifie si l'utilisateur a liké le post
             post.isReposted = post.reposts.some(repost => repost.toString() === userId.toString()); // Vérifie si l'utilisateur a reposté le post
+            post.isSigneted = post.signets.some(signet => signet.toString() === userId.toString());
         });
 
         res.status(200).json(posts);
@@ -53,6 +54,7 @@ exports.getGlobalFeed = async (req, res) => {
         posts.forEach(post => {
             post.isLiked = post.likes.some(like => like.toString() === userId.toString()); // Vérifie si l'utilisateur a liké le post
             post.isReposted = post.reposts.some(repost => repost.toString() === userId.toString()); // Vérifie si l'utilisateur a reposté le post
+            post.isSigneted = post.signets.some(signet => signet.toString() === userId.toString());
         });
 
         res.status(200).json(posts);

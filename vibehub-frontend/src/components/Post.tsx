@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Heart, MessageCircle, Repeat2 } from "lucide-react";
+import { Heart, MessageCircle, Repeat2, Bookmark } from "lucide-react";
 import PostService from "../services/postService";
 import { useNavigate } from "react-router-dom";
 import AvatarPlaceholder from "./Avatar.tsx";
@@ -8,6 +8,7 @@ interface PostUser {
   avatar: string;
   name: string;
   username: string;
+  profilePicture: string;
 }
 
 interface PostProps {
@@ -18,8 +19,10 @@ interface PostProps {
   comments?: number;
   likes?: number;
   shares?: number;
+  signets?: number;
   isLiked?: boolean;
   isReposted?: boolean;
+  isSigneted?: boolean;
   media?: string[]; // Liste des URL des médias
 }
 
@@ -31,15 +34,19 @@ const Post: React.FC<PostProps> = ({
                                      comments = 0,
                                      likes = 0,
                                      shares = 0,
+                                     signets = 0,
                                      isLiked = false,
                                      isReposted = false,
+                                     isSigneted = false,
                                      media = [],
                                    }) => {
   const navigate = useNavigate();
   const [isLikedState, setIsLikedState] = useState(isLiked);
   const [isRepostedState, setIsRepostedState] = useState(isReposted);
+  const [isSignetedState, setIsSignetedState] = useState(isSigneted);
   const [likeCount, setLikeCount] = useState(likes);
   const [sharesCount, setSharesCount] = useState(shares);
+  const [signetsCount, setSignetsCount] = useState(signets);
 
   // Fonction pour déterminer si un média est une vidéo
   const isVideo = (url: string) => {
@@ -73,6 +80,19 @@ const Post: React.FC<PostProps> = ({
     }
   };
 
+  const handleSignetClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      if (id) {
+        await PostService.toggleSignet(id);
+        setIsSignetedState(!isSignetedState);
+        setSignetsCount(isSignetedState ? signetsCount - 1 : signetsCount + 1);
+      }
+    } catch (error) {
+      console.error("Erreur lors du toggle du signet :", error);
+    }
+  };
+
   const handlePostClick = () => {
     if (id) {
       navigate(`/post/${id}`);
@@ -90,7 +110,6 @@ const Post: React.FC<PostProps> = ({
     const API_URL = "http://localhost:5000/";
     return `${API_URL}${url}`;
   };
-  console.log(user)
   return (
       <div
           className="bg-[var(--bg-secondary)] border border-gray-700 rounded-lg p-4 cursor-pointer hover:bg-opacity-80 transition-all"
@@ -143,6 +162,10 @@ const Post: React.FC<PostProps> = ({
               <div className="flex items-center space-x-2 cursor-pointer hover:text-[var(--accent)]" onClick={handleFavoriteClick}>
                 <Heart size={18} className={isLikedState ? "text-red-500" : ""} />
                 <span>{likeCount}</span>
+              </div>
+              <div className="flex items-center space-x-2 cursor-pointer hover:text-[var(--accent)]" onClick={handleSignetClick}>
+                <Bookmark size={18} className={isSignetedState ? "text-[var(--accent)]" : ""} />
+                <span>{signetsCount}</span>
               </div>
             </div>
           </div>
