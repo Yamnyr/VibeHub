@@ -10,8 +10,8 @@ interface User {
     email: string;
     profilePicture?: string;
     bio?: string;
-    followersCount: number;
-    followingCount: number;
+    followers: string[]; // ✅ Liste des IDs des abonnés
+    following: string[];
 }
 
 interface AuthResponse {

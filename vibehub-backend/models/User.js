@@ -7,8 +7,8 @@ const UserSchema = new mongoose.Schema({
     profilePicture: { type: String, default: '' },
     banner: { type: String, default: '' },
     bio: { type: String, default: '' },
-    followersCount: { type: Number, default: 0 },
-    followingCount: { type: Number, default: 0 },
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // ✅ Ajout des followers
+    following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     createdAt: { type: Date, default: Date.now }
 });
 
