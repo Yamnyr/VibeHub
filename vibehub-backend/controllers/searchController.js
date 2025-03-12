@@ -1,6 +1,42 @@
 const Post = require('../models/Post'); // Import the Post model
 const User = require('../models/User'); // Import the User model
 
+
+
+
+
+
+
+// Recherche avancées
+exports.search = async (req, res) => {
+    try {
+        const query = req.query.query || '';
+       console.log(query);
+       const posts = await Post.find({ content: { $regex: query, $options: 'i' } })
+       .sort({ createdAt: -1 }) // Sort by newest first
+       .populate('userId', 'username profileImage'); // Populate user details
+        console.log(posts);
+       // Find users whose username matches the query
+       
+       const users = await User.find({ username: { $regex: query, $options: 'i' } });
+       console.log(users);
+       
+       if(query.charAt(0) === "#") {
+        query = query.slice(1);
+       }
+       const hashtags = await Post.find({ hashtags: { $in: ["#"+query] } })       
+       .sort({ createdAt: -1 }) // Sort by newest first
+       .populate('userId', 'username profileImage'); // Populate user details
+        console.log(hashtags);
+        
+        res.status(200).json({users,posts,hashtags});
+    } catch (err) {
+        res.status(500).json({ error: 'Une erreur est survenue lors de la recherche de posts' });
+    }
+};
+
+
+
 // Recherche des posts par mots-clés
 exports.searchPosts = async (req, res) => {
     try {

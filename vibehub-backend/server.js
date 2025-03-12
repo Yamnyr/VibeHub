@@ -7,6 +7,7 @@ const followRoutes = require('./routes/followRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const postRoutes = require('./routes/postRoutes');
 const feedRoutes = require('./routes/feedRoutes');
+const searchRoutes = require('./routes/searchRoutes');
 const connectDB = require("./config/db");
 const {join} = require("path");
 const http = require("http");
@@ -26,6 +27,7 @@ app.use('/api/', followRoutes);
 app.use('/api/', notificationRoutes);
 app.use('/api/', postRoutes);
 app.use('/api/', feedRoutes);
+app.use('/api/', searchRoutes);
 app.use("/uploads", express.static(join(__dirname, "uploads")));
 app.get("/", (req, res) => {
     res.send("Bienvenue sur l'API VibaeHub Clone !");
