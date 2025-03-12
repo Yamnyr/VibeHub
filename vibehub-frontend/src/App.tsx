@@ -18,7 +18,7 @@ function App() {
                         <Route path="/post/:id" element={<PostDetail />} />
                         <Route path="login" element={<Login/>}/>
                         <Route path="register" element={<Register/>}/>
-                        <Route path="Profile" element={<Profile/>}/>
+                        <Route path="/profile/:userId" element={<Profile/>}/>
                         {/*<Route path="postdetail/:id" element={<PostDetail/>}/>*/}
                         <Route path="register" element={<Register/>}/>
                         <Route path="parametre" element={<Parametre/>}/>

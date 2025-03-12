@@ -233,30 +233,33 @@ exports.getUserSignets = async (req, res) => {
 // Obtenir tous les abonnés d'un utilisateur
 exports.getFollowers = async (req, res) => {
     try {
-        const followers = await Follow.find({ followingId: req.params.id })
-            .sort({ createdAt: -1 })
-            .populate('followerId', 'username profilePicture bio');
+        const user = await User.findById(req.params.id).populate("followers", "username profilePicture bio");
 
-        const followersList = followers.map(follow => follow.followerId);
-        res.status(200).json(followersList);
+        if (!user) {
+            return res.status(404).json({ error: "Utilisateur non trouvé" });
+        }
+
+        res.status(200).json(user.followers);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Erreur lors de la récupération des abonnés' });
+        res.status(500).json({ error: "Erreur lors de la récupération des abonnés" });
     }
 };
+
 
 // Obtenir tous les abonnements d'un utilisateur
 exports.getFollowing = async (req, res) => {
     try {
-        const following = await Follow.find({ followerId: req.params.id })
-            .sort({ createdAt: -1 })
-            .populate('followingId', 'username profilePicture bio');
+        const user = await User.findById(req.params.id).populate("following", "username profilePicture bio");
 
-        const followingList = following.map(follow => follow.followingId);
-        res.status(200).json(followingList);
+        if (!user) {
+            return res.status(404).json({ error: "Utilisateur non trouvé" });
+        }
+
+        res.status(200).json(user.following);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Erreur lors de la récupération des abonnements' });
+        res.status(500).json({ error: "Erreur lors de la récupération des abonnements" });
     }
 };
 
@@ -265,34 +268,34 @@ exports.followUser = async (req, res) => {
     const followerId = req.userId;
     const followingId = req.params.id;
 
-    // Vérifier que l'utilisateur ne s'abonne pas à lui-même
     if (followerId === followingId) {
-        return res.status(400).json({ error: 'Vous ne pouvez pas vous abonner à vous-même' });
+        return res.status(400).json({ error: "Vous ne pouvez pas vous abonner à vous-même" });
     }
 
     try {
-        // Vérifier si l'abonnement existe déjà
-        const existingFollow = await Follow.findOne({ followerId, followingId });
-        if (existingFollow) {
-            return res.status(400).json({ error: 'Vous êtes déjà abonné à cet utilisateur' });
+        const follower = await User.findById(followerId);
+        const following = await User.findById(followingId);
+
+        if (!follower || !following) {
+            return res.status(404).json({ error: "Utilisateur non trouvé" });
         }
 
-        // Créer un nouvel abonnement
-        const newFollow = new Follow({
-            followerId,
-            followingId
-        });
+        // Vérifie si déjà suivi
+        if (follower.following.includes(followingId)) {
+            return res.status(400).json({ error: "Vous suivez déjà cet utilisateur" });
+        }
 
-        await newFollow.save();
+        // Ajoute l'utilisateur suivi dans la liste `following`
+        follower.following.push(followingId);
+        following.followers.push(followerId);
 
-        // Mettre à jour les compteurs d'abonnés et d'abonnements
-        await User.findByIdAndUpdate(followerId, { $inc: { followingCount: 1 } });
-        await User.findByIdAndUpdate(followingId, { $inc: { followersCount: 1 } });
+        await follower.save();
+        await following.save();
 
-        res.status(200).json({ message: 'Abonnement réussi' });
+        res.status(200).json({ message: "Abonnement réussi" });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Erreur lors de l\'abonnement' });
+        res.status(500).json({ error: "Erreur lors de l'abonnement" });
     }
 };
 
@@ -302,23 +305,32 @@ exports.unfollowUser = async (req, res) => {
     const followingId = req.params.id;
 
     try {
-        // Trouver et supprimer l'abonnement
-        const follow = await Follow.findOneAndDelete({ followerId, followingId });
+        const follower = await User.findById(followerId);
+        const following = await User.findById(followingId);
 
-        if (!follow) {
-            return res.status(400).json({ error: 'Vous n\'êtes pas abonné à cet utilisateur' });
+        if (!follower || !following) {
+            return res.status(404).json({ error: "Utilisateur non trouvé" });
         }
 
-        // Mettre à jour les compteurs d'abonnés et d'abonnements
-        await User.findByIdAndUpdate(followerId, { $inc: { followingCount: -1 } });
-        await User.findByIdAndUpdate(followingId, { $inc: { followersCount: -1 } });
+        // Vérifie si l'utilisateur est bien suivi avant de supprimer
+        if (!follower.following.includes(followingId)) {
+            return res.status(400).json({ error: "Vous ne suivez pas cet utilisateur" });
+        }
 
-        res.status(200).json({ message: 'Désabonnement réussi' });
+        // Supprime l'utilisateur suivi de la liste `following`
+        follower.following = follower.following.filter(id => id.toString() !== followingId);
+        following.followers = following.followers.filter(id => id.toString() !== followerId);
+
+        await follower.save();
+        await following.save();
+
+        res.status(200).json({ message: "Désabonnement réussi" });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Erreur lors du désabonnement' });
+        res.status(500).json({ error: "Erreur lors du désabonnement" });
     }
 };
+
 
 // Rechercher des utilisateurs
 exports.searchUsers = async (req, res) => {

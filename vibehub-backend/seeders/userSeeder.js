@@ -65,9 +65,23 @@ const seed = async () => {
         // Insérer les utilisateurs dans la base de données
         const createdUsers = await User.insertMany(hashedUsers);
 
+        // Ajouter des abonnements aléatoires
+        createdUsers.forEach(user => {
+            let potentialFollowers = createdUsers.filter(u => u._id.toString() !== user._id.toString()); // Exclure lui-même
+            let shuffled = potentialFollowers.sort(() => 0.5 - Math.random()); // Mélange aléatoire
+            let followers = shuffled.slice(0, 2).map(u => u._id); // Sélectionne 2 abonnés aléatoires
+
+            user.followers = followers;
+            user.following = followers; // Suit aussi les mêmes personnes
+        });
+
+        // Sauvegarder les modifications
+        await Promise.all(createdUsers.map(user => user.save()));
+
+        console.log("✅ Seed des utilisateurs terminé avec followers et following !");
         return createdUsers;
     } catch (error) {
-        console.error('Erreur lors de la création des utilisateurs:', error);
+        console.error('❌ Erreur lors de la création des utilisateurs:', error);
         throw error;
     }
 };
