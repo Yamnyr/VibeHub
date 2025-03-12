@@ -2,12 +2,11 @@ const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
-const userRoutes = require('./routes/userRoutes');
-const likeRoutes = require('./routes/likeRoutes');
-const repostRoutes = require('./routes/repostRoutes');
+const userRoutes = require('./routes/userRoutes');;
 const followRoutes = require('./routes/followRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const postRoutes = require('./routes/postRoutes');
+const feedRoutes = require('./routes/feedRoutes');
 const connectDB = require("./config/db");
 
 dotenv.config();
@@ -19,11 +18,10 @@ app.use(express.json());
 
 // Routes
 app.use('/api/users', userRoutes);
-app.use('/api/', repostRoutes);
-app.use('/api/', likeRoutes);
 app.use('/api/', followRoutes);
 app.use('/api/', notificationRoutes);
 app.use('/api/', postRoutes);
+app.use('/api/', feedRoutes);
 app.get("/", (req, res) => {
     res.send("Bienvenue sur l'API VibaeHub Clone !");
 });

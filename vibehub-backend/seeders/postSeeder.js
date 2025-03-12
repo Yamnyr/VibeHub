@@ -42,13 +42,37 @@ const generatePosts = (users, count = 50) => {
         const hasMedia = Math.random() > 0.7; // 30% de chance d'avoir des médias
         const media = hasMedia ? [mediaUrls[Math.floor(Math.random() * mediaUrls.length)]] : [];
 
+        // Sélectionner aléatoirement des utilisateurs qui ont liké ou reposté
+        const likesCount = Math.floor(Math.random() * users.length);
+        const repostsCount = Math.floor(Math.random() * users.length);
+
+        // Générer des utilisateurs aléatoires pour likes et reposts
+        const randomLikes = [];
+        const randomReposts = [];
+
+        while (randomLikes.length < likesCount) {
+            const randomLikeUser = users[Math.floor(Math.random() * users.length)];
+            if (!randomLikes.includes(randomLikeUser._id) && randomLikeUser._id !== randomUser._id) {
+                randomLikes.push(randomLikeUser._id);
+            }
+        }
+
+        while (randomReposts.length < repostsCount) {
+            const randomRepostUser = users[Math.floor(Math.random() * users.length)];
+            if (!randomReposts.includes(randomRepostUser._id) && randomRepostUser._id !== randomUser._id) {
+                randomReposts.push(randomRepostUser._id);
+            }
+        }
+
         posts.push({
             userId: randomUser._id,
             content: `${randomContent} ${selectedHashtags.join(' ')}`,
             media,
             hashtags: selectedHashtags.map(tag => tag.substring(1)), // Enlever le # pour stocker
-            likesCount: 0,
-            repostsCount: 0,
+            likes: randomLikes, // Les utilisateurs qui ont liké ce post
+            reposts: randomReposts, // Les utilisateurs qui ont reposté ce post
+            likesCount: randomLikes.length,
+            repostsCount: randomReposts.length,
             commentsCount: 0,
             parentId: null // Ces posts sont des posts principaux
         });

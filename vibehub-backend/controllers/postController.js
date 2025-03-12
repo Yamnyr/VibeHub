@@ -1,6 +1,4 @@
 const Post = require('../models/Post');
-const Like = require('../models/Like');
-const Repost = require('../models/Repost');
 
 exports.createPost = async (req, res) => {
     try {
@@ -114,7 +112,11 @@ exports.getPostComments = async (req, res) => {
 
 exports.getPostLikes = async (req, res) => {
     try {
-        const likes = await Like.find({ postId: req.params.id }).populate('userId', 'username profilePicture');
+        const post = await Post.findById(req.params.id);
+        if (!post) {
+            return res.status(404).json({ message: "Post non trouvé" });
+        }
+        const likes = post.likes; // Tableau des utilisateurs ayant liké
         res.status(200).json(likes);
     } catch (error) {
         res.status(500).json({ message: "Erreur lors de la récupération des likes", error });
@@ -123,9 +125,69 @@ exports.getPostLikes = async (req, res) => {
 
 exports.getPostReposts = async (req, res) => {
     try {
-        const reposts = await Repost.find({ postId: req.params.id }).populate('userId', 'username profilePicture');
+        const post = await Post.findById(req.params.id);
+        if (!post) {
+            return res.status(404).json({ message: "Post non trouvé" });
+        }
+        const reposts = post.reposts; // Tableau des utilisateurs ayant reposté
         res.status(200).json(reposts);
     } catch (error) {
         res.status(500).json({ message: "Erreur lors de la récupération des reposts", error });
+    }
+};
+
+exports.toggleFavorite = async (req, res) => {
+    try {
+        const postId = req.params.id;
+        const userId = req.userId;
+        const post = await Post.findById(postId);
+
+        if (!post) {
+            return res.status(404).json({ message: "Post non trouvé" });
+        }
+
+        // Ajouter ou retirer un like
+        if (post.likes.includes(userId)) {
+            post.likes.pull(userId); // Si déjà liké, retirer le like
+            console.log("oui")
+        } else {
+            post.likes.push(userId); // Sinon, ajouter le like
+            console.log("non")
+        }
+
+        // Mettre à jour le compteur de likes
+        post.likesCount = post.likes.length;
+        await post.save();
+
+        res.status(200).json({ message: "Likes mis à jour", post });
+    } catch (error) {
+        res.status(500).json({ message: "Erreur lors du toggle du favori", error });
+    }
+};
+
+exports.toggleRepost = async (req, res) => {
+    try {
+        const postId = req.params.id;
+        const userId = req.userId;
+        const post = await Post.findById(postId);
+
+        if (!post) {
+            return res.status(404).json({ message: "Post non trouvé" });
+        }
+
+        // Ajouter ou retirer un repost
+        if (post.reposts.includes(userId)) {
+            post.reposts.pull(userId); // Si déjà reposté, retirer le repost
+        } else {
+            post.reposts.push(userId); // Sinon, ajouter le repost
+        }
+
+        // Mettre à jour le compteur de reposts
+        post.repostsCount = post.reposts.length;
+        await post.save();
+
+        res.status(200).json({ message: "Repost mis à jour", post });
+    } catch (error) {
+        res.status(500).json({ message: "Erreur lors du repost", error });
     }
 };

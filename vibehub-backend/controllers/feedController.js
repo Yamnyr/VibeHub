@@ -1,36 +1,63 @@
-const Post = require('../models/Post'); // Import the Post model
-const User = require('../models/User'); // Import the User model
+const Post = require("../models/Post");
+const User = require("../models/User");
 
-// Fil d'actualité personnalisé
 exports.getUserFeed = async (req, res) => {
     try {
         const userId = req.userId;
 
-        // Find the list of users the current user follows
+        // Récupérer l'utilisateur et ses abonnements (following)
         const user = await User.findById(userId).populate('following', '_id');
         const followingIds = user.following.map(u => u._id);
 
-        // Get the latest posts from the users the current user follows
-        const posts = await Post.find({ userId: { $in: followingIds } })
-            .sort({ createdAt: -1 }) // Sort by newest first
-            .populate('userId', 'username profileImage'); // Populate user details
+        // Récupérer les posts des utilisateurs suivis
+        const posts = await Post.find({
+            userId: { $in: followingIds },
+            $or: [
+                { parentId: null },
+                { parentId: { $exists: false } }
+            ]
+        })
+            .sort({ createdAt: -1 })
+            .populate('userId', 'username profileImage')
+            .lean(); // Utilisation de lean() pour travailler avec des objets JavaScript simples
+
+        // Ajouter si l'utilisateur a liké ou reposté le post
+        posts.forEach(post => {
+            post.isLiked = post.likes.includes(userId.toString()); // Vérifie si l'utilisateur a liké le post
+            post.isReposted = post.reposts.includes(userId.toString()); // Vérifie si l'utilisateur a reposté le post
+        });
 
         res.status(200).json(posts);
     } catch (err) {
+        console.error('Erreur feed utilisateur:', err);
         res.status(500).json({ error: 'Une erreur est survenue lors de la récupération du fil d\'actualités personnalisé' });
     }
 };
 
-// Fil d'actualité global
 exports.getGlobalFeed = async (req, res) => {
     try {
-        // Get the most recent posts from all users
-        const posts = await Post.find()
-            .sort({ createdAt: -1 }) // Sort by newest first
-            .populate('userId', 'username profileImage'); // Populate user details
+        const userId = req.userId;
+
+        // Récupérer tous les posts récents de tous les utilisateurs
+        const posts = await Post.find({
+            $or: [
+                { parentId: null },
+                { parentId: { $exists: false } }
+            ]
+        })
+            .sort({ createdAt: -1 })
+            .populate('userId', 'username profileImage')
+            .lean(); // Utilisation de lean() pour travailler avec des objets JavaScript simples
+
+        // Ajouter si l'utilisateur a liké ou reposté le post
+        posts.forEach(post => {
+            post.isLiked = post.likes.some(like => like.toString() === userId.toString()); // Vérifie si l'utilisateur a liké le post
+            post.isReposted = post.reposts.some(repost => repost.toString() === userId.toString()); // Vérifie si l'utilisateur a reposté le post
+        });
 
         res.status(200).json(posts);
     } catch (err) {
+        console.error('Erreur feed global:', err);
         res.status(500).json({ error: 'Une erreur est survenue lors de la récupération du fil d\'actualités global' });
     }
 };

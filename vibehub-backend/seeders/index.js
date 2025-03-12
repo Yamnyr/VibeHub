@@ -2,9 +2,7 @@ const mongoose = require("mongoose")
 const dotenv = require("dotenv")
 const userSeeder = require("./userSeeder")
 const postSeeder = require("./postSeeder")
-const likeSeeder = require("./likeSeeder")
 const followSeeder = require("./followSeeder")
-const repostSeeder = require("./repostSeeder")
 const signetSeeder = require("./signetSeeder")
 const hashtagSeeder = require("./hashtagSeeder")
 const notificationSeeder = require("./notificationSeeder")
@@ -33,17 +31,9 @@ const seedDatabase = async () => {
         const hashtags = await hashtagSeeder.seed(posts)
         console.log(`✅ Created ${hashtags.length} hashtags`)
 
-        // 4. Create likes on posts
-        const likes = await likeSeeder.seed(users, posts)
-        console.log(`✅ Created ${likes.length} likes`)
-
         // 5. Create follows between users
         const follows = await followSeeder.seed(users)
         console.log(`✅ Created ${follows.length} follows`)
-
-        // 6. Create reposts
-        const reposts = await repostSeeder.seed(users, posts)
-        console.log(`✅ Created ${reposts.length} reposts`)
 
         // 7. Create bookmarks
         const signets = await signetSeeder.seed(users, posts)

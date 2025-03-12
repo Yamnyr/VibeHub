@@ -7,7 +7,7 @@ const router = express.Router();
 
 // Routes pour le fil d'actualité
 router.get('/feed', authMiddleware, feedController.getUserFeed); // Fil d'actualité personnalisé
-router.get('/feed/global', feedController.getGlobalFeed); // Fil d'actualité global
+router.get('/feed/global', authMiddleware, feedController.getGlobalFeed); // Fil d'actualité global
 
 
 
