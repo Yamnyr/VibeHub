@@ -16,11 +16,11 @@ function Sidebar() {
                     <a href="/" className="flex items-center space-x-3 text-lg text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors">
                         <Home /> <span>Home</span>
                     </a>
-                    {/*<a href="#" className="flex items-center space-x-3 text-lg text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors">*/}
-                    {/*    <div className="flex items-center space-x-3">*/}
-                    {/*        <NotificationDropdown />*/}
-                    {/*    </div>*/}
-                    {/*</a>*/}
+                    <a href="#" className="flex items-center space-x-3 text-lg text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors">
+                        <div className="flex items-center space-x-3">
+                            <NotificationDropdown />
+                        </div>
+                    </a>
                     {/*<a href="#" className="flex items-center space-x-3 text-lg text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors">*/}
                     {/*    <BookMarked /> <span>Bookmarks</span>*/}
                     {/*</a>*/}

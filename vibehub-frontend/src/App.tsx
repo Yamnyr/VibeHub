@@ -15,10 +15,11 @@ function App() {
                 <Wrapper>
                     <Routes>
                         <Route index element={<Accueil/>}/>
+                        <Route path="/post/:id" element={<PostDetail />} />
                         <Route path="login" element={<Login/>}/>
                         <Route path="register" element={<Register/>}/>
                         <Route path="Profile" element={<Profile/>}/>
-                        <Route path="postdetail/:id" element={<PostDetail/>}/>
+                        {/*<Route path="postdetail/:id" element={<PostDetail/>}/>*/}
                         <Route path="register" element={<Register/>}/>
                         <Route path="parametre" element={<Parametre/>}/>
                     </Routes>
