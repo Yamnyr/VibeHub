@@ -1,4 +1,3 @@
-// ProfileHeader.tsx
 import React from 'react';
 import { User } from "../../services/profileService";
 import AvatarPlaceholder from "../../components/Avatar";
@@ -9,7 +8,7 @@ interface ProfileHeaderProps {
     isFollowing: boolean;
     followersCount: number;
     followingCount: number;
-    handleToggleFollow: () => void;
+    handleToggleFollow: (userId: string) => void;
     onTabChange: (tab: 'posts' | 'likes' | 'reposts' | 'savedPosts' | 'followers' | 'following') => void;
 }
 
@@ -45,9 +44,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                             <p className="text-gray-500">@{user.username}</p>
                         </div>
                     </div>
+
                     {!isCurrentUser && (
                         <button
-                            onClick={handleToggleFollow}
+                            onClick={() => handleToggleFollow(user._id)}
                             className={`mt-10 ${
                                 isFollowing
                                     ? 'bg-transparent border border-[var(--accent)] text-[var(--accent)]'

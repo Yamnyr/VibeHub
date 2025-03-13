@@ -1,8 +1,8 @@
-// ProfileContent.tsx
 import React from 'react';
 import { User, Post as PostType } from "../../services/profileService";
 import Post from "../../components/Post.tsx";
 import UserCard from './UserCard';
+import authService from "../../services/authService";
 
 interface ProfileContentProps {
     activeTab: 'posts' | 'likes' | 'reposts' | 'savedPosts' | 'followers' | 'following';
@@ -13,7 +13,8 @@ interface ProfileContentProps {
     followers: User[];
     following: User[];
     isCurrentUser: boolean;
-    handleToggleFollow: (userId?: string) => void;
+    handleToggleFollow: (userId: string) => void;
+    isFollowing?: boolean;
 }
 
 const ProfileContent: React.FC<ProfileContentProps> = ({
@@ -25,7 +26,8 @@ const ProfileContent: React.FC<ProfileContentProps> = ({
                                                            followers,
                                                            following,
                                                            isCurrentUser,
-                                                           handleToggleFollow
+                                                           handleToggleFollow,
+                                                           isFollowing
                                                        }) => {
     return (
         <div className="mt-4">
@@ -109,7 +111,7 @@ interface UserSectionProps {
     title: string;
     users: User[];
     emptyMessage: string;
-    handleToggleFollow: (userId?: string) => void;
+    handleToggleFollow: (userId: string) => void;
 }
 
 const UserSection: React.FC<UserSectionProps> = ({ title, users, emptyMessage, handleToggleFollow }) => (

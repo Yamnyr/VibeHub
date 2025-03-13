@@ -72,6 +72,7 @@ export const authService = {
         const user = localStorage.getItem('user');
         const token = localStorage.getItem('token');
         return user && token ? { user: JSON.parse(user), token } : null;
+        console.log(user)
     },
 
     fetchUserProfile: async (): Promise<User> => {

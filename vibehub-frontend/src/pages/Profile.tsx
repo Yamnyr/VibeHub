@@ -66,42 +66,26 @@ export default function Profile() {
         }
     };
 
-    // Fonction pour basculer l'abonnement
-    const handleToggleFollow = async (targetUserId?: string) => {
-        // Utiliser targetUserId s'il est fourni, sinon utiliser l'ID du profil actuel
-        const userToToggle = targetUserId || userId;
-
-        if (!userToToggle || !user) return;
+    // Fonction pour basculer l'abonnement (simplifiée)
+    const handleToggleFollow = async (targetUserId: string) => {
+        if (!targetUserId) return;
 
         try {
-            const result = await ProfileService.toggleFollow(userToToggle);
+            const result = await ProfileService.toggleFollow(targetUserId);
 
-            // Si on modifie l'abonnement au profil actuel
-            if (userToToggle === userId) {
+            // Si on toggle l'abonnement au profil affiché actuellement
+            if (targetUserId === userId && user) {
                 setIsFollowing(result.isFollowing);
 
-                // Mettre à jour le nombre d'abonnés
-                if (result.isFollowing) {
-                    // Ajouter l'utilisateur courant aux abonnés si ce n'est pas déjà le cas
-                    const currentUser = authService.getCurrentUser();
-                    if (currentUser && !followers.some(f => f._id === currentUser.user._id)) {
-                        const currentUserData = await ProfileService.getUserById(currentUser.user._id);
-                        setFollowers(prev => [...prev, currentUserData]);
-                    }
-                } else {
-                    // Retirer l'utilisateur courant des abonnés
-                    const currentUser = authService.getCurrentUser();
-                    if (currentUser) {
-                        setFollowers(prev => prev.filter(f => f._id !== currentUser.user._id));
-                    }
-                }
+                // Mettre à jour la liste des abonnés
+                fetchData();
             } else {
-                // Si on modifie un abonnement dans la liste, mettre à jour la liste des abonnements
-                setFollowing(prev =>
-                    result.isFollowing
-                        ? [...prev, { _id: userToToggle }] // Ajouter l'utilisateur
-                        : prev.filter(f => f._id !== userToToggle) // Retirer l'utilisateur
-                );
+                // Mettre à jour la liste des abonnements si nécessaire
+                const currentUserId = authService.getCurrentUser()?.user?._id;
+                if (currentUserId) {
+                    const updatedFollowing = await ProfileService.getUserFollowing(currentUserId);
+                    setFollowing(updatedFollowing);
+                }
             }
         } catch (error) {
             console.error("Erreur lors de la modification de l'abonnement:", error);
@@ -151,6 +135,7 @@ export default function Profile() {
                 following={following}
                 isCurrentUser={isCurrentUser}
                 handleToggleFollow={handleToggleFollow}
+                isFollowing={isFollowing}
             />
         </div>
     );
