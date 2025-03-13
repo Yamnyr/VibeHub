@@ -96,24 +96,28 @@ const PostDetail: React.FC = () => {
 
   const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+  
     if (!newComment.trim() || !id) return;
-
+  
     try {
-      const formData = new FormData();
-      formData.append("content", newComment);
-      formData.append("parentId", id);
-
-      await PostService.createPost(formData);
-
+      const response = await PostService.createPost({
+        content: newComment,
+        parentId: id,
+      });
+  
+      console.log("Réponse du serveur après création :", response);
+  
       setNewComment("");
-
+  
+      // Vérifie que la réponse contient bien les nouvelles données
       const updatedComments = await PostService.getPostComments(id);
-      setComments(updatedComments);
+      console.log("Commentaires mis à jour :", updatedComments);
+      setComments([...updatedComments]);
     } catch (error) {
       console.error("Erreur lors de l'envoi du commentaire:", error);
     }
   };
+   
 
   const formatTime = (dateString: string): string => {
     const date = new Date(dateString);

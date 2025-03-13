@@ -5,7 +5,7 @@ exports.createPost = async (req, res) => {
     try {
         const { content, hashtags, parentId } = req.body;
         const userId = req.userId;
-        
+
         if (!content && (!req.files || !req.files.media)) {
             return res.status(400).json({ message: "Un post doit contenir du texte ou un média" });
         }
@@ -42,13 +42,12 @@ exports.createPost = async (req, res) => {
         if (parentId) {
             await Post.findByIdAndUpdate(parentId, { $inc: { commentsCount: 1 } });
             const originalPost = await Post.findById(parentId);
-            if (
-                connectedUsers.has(originalPost.userId.toString())) {
+            if (connectedUsers.has(originalPost.userId.toString())) {
                 io.to(connectedUsers.get(originalPost.userId.toString())).emit("newComment", newPost);
             }
 
         }
-
+        
         res.status(201).json({ message: "Post créé avec succès", post: newPost });
     } catch (error) {
         res.status(500).json({ message: "Erreur lors de la création du post", error });
