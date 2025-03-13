@@ -11,11 +11,10 @@ const AvatarPlaceholder = ({ src, size = "w-24 h-24" }: { src?: string; size?: s
             {src ? (
                 <img src={src} alt="Avatar" className="w-full h-full object-cover" />
             ) : (
-                <UserIcon size={48} className="text-gray-500" />
-            )}
-            <Webcam ref={webcamRef} className='transform scale-[1.35]
+                <Webcam ref={webcamRef} className='transform scale-[1.35]
             ' screenshotFormat="image/jpeg"  />
-             
+
+            )}
         </div>
     );
 };

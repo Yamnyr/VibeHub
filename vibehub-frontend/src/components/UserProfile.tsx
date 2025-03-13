@@ -18,7 +18,7 @@ const UserProfile = () => {
             
             {/* ✅ Profil avec Avatar et Infos utilisateur */}
             <div className="flex items-center space-x-4">
-                <AvatarPlaceholder src={user.profilePicture} size="w-48 h-48" />
+                <AvatarPlaceholder size="w-48 h-48" />
                 {/* ✅ Informations utilisateur à droite */}
                 
                   
