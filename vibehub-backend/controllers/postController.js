@@ -1,5 +1,5 @@
 const Post = require('../models/Post');
-
+const { io, connectedUsers } = require("../server");
 
 exports.createPost = async (req, res) => {
     try {
@@ -29,6 +29,12 @@ exports.createPost = async (req, res) => {
 
         if (parentId) {
             await Post.findByIdAndUpdate(parentId, { $inc: { commentsCount: 1 } });
+            const originalPost = await Post.findById(parentId);
+            if (
+                connectedUsers.has(originalPost.userId.toString())) {
+                io.to(connectedUsers.get(originalPost.userId.toString())).emit("newComment", newPost);
+            }
+
         }
 
         res.status(201).json({ message: "Post créé avec succès", post: newPost });
