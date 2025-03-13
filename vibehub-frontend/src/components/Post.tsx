@@ -1,12 +1,10 @@
-// Dans Post.ProfileTabs.tsx
-
 import React, { useEffect, useState } from "react";
-import { Heart, MessageCircle, Repeat2, Bookmark } from "lucide-react";
+import { Heart, MessageCircle, Repeat2, Bookmark, Languages, FileText } from "lucide-react";
 import PostService from "../services/postService";
+import AIService from "../services/iaService.ts";
 import { useNavigate } from "react-router-dom";
 import AvatarPlaceholder from "./Avatar.tsx";
 
-// Modifiez l'interface des props pour ne recevoir que l'ID
 interface PostProps {
   id: string;
 }
@@ -22,6 +20,14 @@ const Post: React.FC<PostProps> = ({ id }) => {
   const [sharesCount, setSharesCount] = useState(0);
   const [signetsCount, setSignetsCount] = useState(0);
   const [commentsCount, setCommentsCount] = useState(0);
+
+  // États pour les fonctionnalités de traduction et résumé
+  const [translatedContent, setTranslatedContent] = useState<string | null>(null);
+  const [summarizedContent, setSummarizedContent] = useState<string | null>(null);
+  const [isTranslating, setIsTranslating] = useState(false);
+  // const [isSummarizing, setIsSummarizing] = useState(false);
+  const [showTranslation, setShowTranslation] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
 
   // Charger les données du post au chargement du composant
   useEffect(() => {
@@ -64,7 +70,7 @@ const Post: React.FC<PostProps> = ({ id }) => {
     return videoExtensions.some(ext => url.toLowerCase().endsWith(ext));
   };
 
-  // Les gestionnaires d'événements restent en grande partie inchangés
+  // Les gestionnaires d'événements pour les actions standard (inchangés)
   const handleFavoriteClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
     try {
@@ -98,6 +104,101 @@ const Post: React.FC<PostProps> = ({ id }) => {
     }
   };
 
+  // Fonctions modifiées pour les nouvelles fonctionnalités
+  const handleTranslateClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    if (!post?.content) return;
+
+    // Si on a déjà une traduction, on bascule simplement l'affichage
+    if (translatedContent) {
+      setShowTranslation(!showTranslation);
+      return;
+    }
+
+    // Si on n'a pas encore de traduction et qu'on veut l'afficher, on la génère
+    if (!translatedContent && !isTranslating && showTranslation) {
+      setIsTranslating(true);
+      try {
+        const result = await AIService.translateText(post.content, "French");
+        setTranslatedContent(result.translated_text);
+      } catch (error) {
+        console.error("Erreur lors de la traduction :", error);
+      } finally {
+        setIsTranslating(false);
+      }
+    }
+
+    // Bascule l'affichage de la traduction
+    setShowTranslation(!showTranslation);
+  };
+  //
+  // const handleSummarizeClick = async (e: React.MouseEvent) => {
+  //   e.stopPropagation();
+  //
+  //   if (!post?.content) return;
+  //
+  //   // Si on a déjà un résumé, on bascule simplement l'affichage
+  //   if (summarizedContent) {
+  //     setShowSummary(!showSummary);
+  //     return;
+  //   }
+  //
+  //   // Si on n'a pas encore de résumé et qu'on veut l'afficher, on le génère
+  //   if (!summarizedContent && !isSummarizing && showSummary) {
+  //     setIsSummarizing(true);
+  //     try {
+  //       const result = await AIService.summarizeText(post.content);
+  //       setSummarizedContent(result);
+  //     } catch (error) {
+  //       console.error("Erreur lors du résumé :", error);
+  //     } finally {
+  //       setIsSummarizing(false);
+  //     }
+  //   }
+  //
+  //   // Bascule l'affichage du résumé
+  //   setShowSummary(!showSummary);
+  // };
+
+  // Effet pour générer la traduction lorsque showTranslation passe à true
+  useEffect(() => {
+    const generateTranslation = async () => {
+      if (showTranslation && !translatedContent && !isTranslating && post?.content) {
+        setIsTranslating(true);
+        try {
+          const result = await AIService.translateText(post.content, "French");
+          setTranslatedContent(result.translated_text);
+        } catch (error) {
+          console.error("Erreur lors de la traduction :", error);
+        } finally {
+          setIsTranslating(false);
+        }
+      }
+    };
+
+    generateTranslation();
+  }, [showTranslation, translatedContent, isTranslating, post]);
+
+  // // Effet pour générer le résumé lorsque showSummary passe à true
+  // useEffect(() => {
+  //   const generateSummary = async () => {
+  //     if (showSummary && !summarizedContent && !isSummarizing && post?.content) {
+  //       setIsSummarizing(true);
+  //       try {
+  //         const result = await AIService.summarizeText(post.content);
+  //         setSummarizedContent(result);
+  //       } catch (error) {
+  //         console.error("Erreur lors du résumé :", error);
+  //       } finally {
+  //         setIsSummarizing(false);
+  //       }
+  //     }
+  //   };
+  //
+  //   generateSummary();
+  // }, [showSummary, summarizedContent, isSummarizing, post]);
+
   // Fonction pour obtenir l'URL complète d'un média (inchangée)
   const getMediaUrl = (url: string) => {
     if (url.startsWith('http') || url.startsWith('https')) {
@@ -127,7 +228,7 @@ const Post: React.FC<PostProps> = ({ id }) => {
     );
   }
 
-  // Si post est null ou undefined après le chargement, quelque chose s'est mal passé
+  // Si post est null ou undefined après le chargement
   if (!post) {
     return (
         <div className="bg-[var(--bg-secondary)] border border-gray-700 rounded-lg p-4 text-center">
@@ -155,7 +256,28 @@ const Post: React.FC<PostProps> = ({ id }) => {
               @{post.userId.username} · {formatTime(new Date(post.createdAt))}
             </span>
             </div>
+
             <p className="text-[var(--text-primary)] mt-2">{post.content}</p>
+
+            {/* Affichage du contenu traduit uniquement si showTranslation est true */}
+            {isTranslating && <p className="text-gray-500 mt-1 italic">Traduction en cours...</p>}
+            {showTranslation && translatedContent && (
+                <div className="bg-gray-800 p-2 mt-2 rounded-md">
+                  <p className="text-sm text-[var(--text-primary)]">
+                    <span className="font-bold">Traduction:</span> {translatedContent}
+                  </p>
+                </div>
+            )}
+
+            {/*/!* Affichage du résumé uniquement si showSummary est true *!/*/}
+            {/*{isSummarizing && <p className="text-gray-500 mt-1 italic">Résumé en cours...</p>}*/}
+            {/*{showSummary && summarizedContent && (*/}
+            {/*    <div className="bg-gray-800 p-2 mt-2 rounded-md">*/}
+            {/*      <p className="text-sm text-[var(--text-primary)]">*/}
+            {/*        <span className="font-bold">Résumé:</span> {summarizedContent}*/}
+            {/*      </p>*/}
+            {/*    </div>*/}
+            {/*)}*/}
 
             {/* Affichage des médias */}
             {post.media && post.media.length > 0 && (
@@ -183,7 +305,7 @@ const Post: React.FC<PostProps> = ({ id }) => {
                 </div>
             )}
 
-            {/* Icônes d'interaction */}
+            {/* Icônes d'interaction standard */}
             <div className="flex justify-between text-gray-500 mt-3 text-sm">
               <div className="flex items-center space-x-2 cursor-pointer hover:text-[var(--accent)]">
                 <MessageCircle size={18}/> <span>{commentsCount}</span>
@@ -203,6 +325,20 @@ const Post: React.FC<PostProps> = ({ id }) => {
                 <Bookmark size={18} className={isSignetedState ? "text-[var(--accent)]" : ""}/>
                 <span>{signetsCount}</span>
               </div>
+            </div>
+
+            {/* Barre d'outils pour traduction et résumé */}
+            <div className="flex justify-between text-gray-500 mt-3 pt-2 border-t border-gray-700 text-xs">
+              <div className="flex items-center space-x-2 cursor-pointer hover:text-[var(--accent)]"
+                   onClick={handleTranslateClick}>
+                <Languages size={16} className={showTranslation ? "text-[var(--accent)]" : ""}/>
+                <span>{showTranslation ? "Masquer traduction" : "Traduire"}</span>
+              </div>
+              {/*<div className="flex items-center space-x-2 cursor-pointer hover:text-[var(--accent)]"*/}
+              {/*     onClick={handleSummarizeClick}>*/}
+              {/*  <FileText size={16} className={showSummary ? "text-[var(--accent)]" : ""}/>*/}
+              {/*  <span>{showSummary ? "Masquer résumé" : "Résumer"}</span>*/}
+              {/*</div>*/}
             </div>
           </div>
         </div>

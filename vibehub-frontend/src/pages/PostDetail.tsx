@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {Heart, MessageCircle, Repeat2, ArrowLeft, Bookmark} from "lucide-react";
+import { Heart, MessageCircle, Repeat2, ArrowLeft, Bookmark, Languages, FileText } from "lucide-react";
 import PostService, { Post as PostType } from "../services/postService";
+import AIService from "../services/iaService.ts";
 import AvatarPlaceholder from "../components/Avatar.tsx";
 
 interface Comment {
@@ -29,6 +30,14 @@ const PostDetail: React.FC = () => {
   const [likeCount, setLikeCount] = useState(0);
   const [shareCount, setShareCount] = useState(0);
   const [signetsCount, setSignetsCount] = useState(0);
+
+  // États pour les fonctionnalités de traduction et résumé
+  const [translatedContent, setTranslatedContent] = useState<string | null>(null);
+  const [summarizedContent, setSummarizedContent] = useState<string | null>(null);
+  const [isTranslating, setIsTranslating] = useState(false);
+  // const [isSummarizing, setIsSummarizing] = useState(false);
+  const [showTranslation, setShowTranslation] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -93,6 +102,74 @@ const PostDetail: React.FC = () => {
     }
   };
 
+  // Fonctions pour les fonctionnalités de traduction et résumé
+  const handleTranslateClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    if (!post?.content) return;
+
+    // Si on a déjà une traduction, on bascule simplement l'affichage
+    if (translatedContent) {
+      setShowTranslation(!showTranslation);
+      return;
+    }
+
+    // Bascule l'affichage de la traduction
+    setShowTranslation(!showTranslation);
+  };
+
+  // const handleSummarizeClick = async (e: React.MouseEvent) => {
+  //   e.stopPropagation();
+  //
+  //   if (!post?.content) return;
+  //
+  //   // Si on a déjà un résumé, on bascule simplement l'affichage
+  //   if (summarizedContent) {
+  //     setShowSummary(!showSummary);
+  //     return;
+  //   }
+  //
+  //   // Bascule l'affichage du résumé
+  //   setShowSummary(!showSummary);
+  // };
+
+  // Effet pour générer la traduction lorsque showTranslation passe à true
+  useEffect(() => {
+    const generateTranslation = async () => {
+      if (showTranslation && !translatedContent && !isTranslating && post?.content) {
+        setIsTranslating(true);
+        try {
+          const result = await AIService.translateText(post.content, "French");
+          setTranslatedContent(result.translated_text);
+        } catch (error) {
+          console.error("Erreur lors de la traduction :", error);
+        } finally {
+          setIsTranslating(false);
+        }
+      }
+    };
+
+    generateTranslation();
+  }, [showTranslation, translatedContent, isTranslating, post]);
+
+  // Effet pour générer le résumé lorsque showSummary passe à true
+  // useEffect(() => {
+  //   const generateSummary = async () => {
+  //     if (showSummary && !summarizedContent && !isSummarizing && post?.content) {
+  //       setIsSummarizing(true);
+  //       try {
+  //         const result = await AIService.summarizeText(post.content);
+  //         setSummarizedContent(result);
+  //       } catch (error) {
+  //         console.error("Erreur lors du résumé :", error);
+  //       } finally {
+  //         setIsSummarizing(false);
+  //       }
+  //     }
+  //   };
+  //
+  //   generateSummary();
+  // }, [showSummary, summarizedContent, isSummarizing, post]);
 
   const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -117,7 +194,6 @@ const PostDetail: React.FC = () => {
       console.error("Erreur lors de l'envoi du commentaire:", error);
     }
   };
-
 
   const formatTime = (dateString: string): string => {
     const date = new Date(dateString);
@@ -166,10 +242,12 @@ const PostDetail: React.FC = () => {
         </div>
     );
   }
+
   const handleProfileClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Empêche d'ouvrir le post en même temps
     navigate(`/profile/${post.userId._id}`);
   };
+
   return (
       <div className="max-w-xl mx-auto mt-5">
         <button
@@ -193,6 +271,26 @@ const PostDetail: React.FC = () => {
               </span>
               </div>
               <p className="text-[var(--text-primary)] mt-2">{post.content}</p>
+
+              {/* Affichage du contenu traduit uniquement si showTranslation est true */}
+              {isTranslating && <p className="text-gray-500 mt-1 italic">Traduction en cours...</p>}
+              {showTranslation && translatedContent && (
+                  <div className="bg-gray-800 p-2 mt-2 rounded-md">
+                    <p className="text-sm text-[var(--text-primary)]">
+                      <span className="font-bold">Traduction:</span> {translatedContent}
+                    </p>
+                  </div>
+              )}
+
+              {/* Affichage du résumé uniquement si showSummary est true */}
+              {/*{isSummarizing && <p className="text-gray-500 mt-1 italic">Résumé en cours...</p>}*/}
+              {/*{showSummary && summarizedContent && (*/}
+              {/*    <div className="bg-gray-800 p-2 mt-2 rounded-md">*/}
+              {/*      <p className="text-sm text-[var(--text-primary)]">*/}
+              {/*        <span className="font-bold">Résumé:</span> {summarizedContent}*/}
+              {/*      </p>*/}
+              {/*    </div>*/}
+              {/*)}*/}
 
               {/* Affichage des médias */}
               {post.media && post.media.length > 0 && (
@@ -250,6 +348,20 @@ const PostDetail: React.FC = () => {
                   <Bookmark size={18} className={isSignetedState ? "text-[var(--accent)]" : ""}/>
                   <span>{signetsCount}</span>
                 </div>
+              </div>
+
+              {/* Barre d'outils pour traduction et résumé */}
+              <div className="flex justify-between text-gray-500 mt-3 pt-2 border-t border-gray-700 text-xs">
+                <div className="flex items-center space-x-2 cursor-pointer hover:text-[var(--accent)]"
+                     onClick={handleTranslateClick}>
+                  <Languages size={16} className={showTranslation ? "text-[var(--accent)]" : ""}/>
+                  <span>{showTranslation ? "Masquer traduction" : "Traduire"}</span>
+                </div>
+                {/*<div className="flex items-center space-x-2 cursor-pointer hover:text-[var(--accent)]"*/}
+                {/*     onClick={handleSummarizeClick}>*/}
+                {/*  <FileText size={16} className={showSummary ? "text-[var(--accent)]" : ""}/>*/}
+                {/*  <span>{showSummary ? "Masquer résumé" : "Résumer"}</span>*/}
+                {/*</div>*/}
               </div>
             </div>
           </div>
