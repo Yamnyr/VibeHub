@@ -143,7 +143,7 @@ const Post: React.FC<PostProps> = ({ id }) => {
       >
         <div className="flex space-x-4">
           <div onClick={handleProfileClick} className="cursor-pointer">
-            <AvatarPlaceholder src={post.userId.profilePicture} size="w-16 h-16"/>
+            <AvatarPlaceholder src={"http://localhost:5000/" + post.userId.profilePicture} size="w-16 h-16"/>
           </div>
 
           <div className="flex-1">

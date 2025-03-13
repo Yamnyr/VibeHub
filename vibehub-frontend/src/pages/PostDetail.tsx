@@ -179,7 +179,7 @@ const PostDetail: React.FC = () => {
         <div className="bg-[var(--bg-secondary)] border border-gray-700 rounded-lg p-4 mb-4">
           <div className="flex space-x-4">
             <div onClick={handleProfileClick} className="cursor-pointer">
-              <AvatarPlaceholder src={post.userId.profilePicture} size="w-16 h-16"/>
+              <AvatarPlaceholder src={"http://localhost:5000/" + post.userId.profilePicture} size="w-16 h-16"/>
             </div>
             <div className="flex-1">
               <div className="flex items-center space-x-2">

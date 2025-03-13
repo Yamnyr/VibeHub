@@ -2,6 +2,7 @@ import { useAuth } from "../context/AuthContext.tsx";
 import { LogOut, Camera } from "lucide-react";
 import { useState, useEffect } from "react";
 import authService from "../services/authService";
+import Avatar from "../components/Avatar.tsx";
 
 export default function Parametre() {
   const { user, logout } = useAuth();
@@ -42,6 +43,7 @@ export default function Parametre() {
       const file = e.target.files[0];
       setSelectedAvatar(file);
       setAvatar(URL.createObjectURL(file)); // Prévisualisation
+
     }
   };
 
