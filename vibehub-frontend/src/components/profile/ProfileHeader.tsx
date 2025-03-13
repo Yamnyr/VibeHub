@@ -26,7 +26,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             {/* Bannière utilisateur */}
             <div className="relative w-full h-40 bg-gray-800 rounded-t-lg">
                 {user.banner ? (
-                    <img src={user.banner} alt="Bannière" className="w-full h-full object-cover rounded-t-lg" />
+                    <img src={"http://localhost:5000/" + user.banner} alt="Bannière" className="w-full h-full object-cover rounded-t-lg" />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-500">Pas de bannière</div>
                 )}

@@ -4,7 +4,7 @@ const postController = require('../controllers/postController');
 const authMiddleware = require('../middleware/authMiddleware');
 const upload = require('../middleware/uploadMiddleware')
 
-router.post("/posts", authMiddleware, upload.array("media", 5), postController.createPost);
+router.post("/posts", authMiddleware, upload, postController.createPost);
 router.get('/posts/:id', authMiddleware, postController.getPostById);
 router.put('/posts/:id', authMiddleware, postController.updatePost);
 router.delete('/posts/:id', authMiddleware, postController.deletePost);

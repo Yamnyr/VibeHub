@@ -5,7 +5,18 @@ exports.createPost = async (req, res) => {
     try {
         const { content, hashtags, parentId } = req.body;
         const userId = req.userId;
-        const media = req.files.map(file => `uploads/${file.filename}`); // Générer les URLs des fichiers
+        
+        if (!content && (!req.files || !req.files.media)) {
+            return res.status(400).json({ message: "Un post doit contenir du texte ou un média" });
+        }
+
+        // ✅ Vérifie si `req.files.media` existe avant d'utiliser `map()`
+        let media = [];
+        if (req.files && req.files.media) {
+            media = req.files.media.map(file => `uploads/${file.filename}`);
+        }
+        
+        // Générer les URLs des fichiers
         // const flaskResponse = await fetch("http://vibehub-ia:5001/moderate", {
         //     method: "POST",
         //     headers: { "Content-Type": "application/json" },
@@ -17,6 +28,7 @@ exports.createPost = async (req, res) => {
         // if (flaskData.IsToxic === true) {
         //     return res.status(400).json({ message: "Contenu inapproprié" });
         // }
+
         const newPost = new Post({
             userId,
             content,
