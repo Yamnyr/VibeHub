@@ -1,12 +1,12 @@
-Thought for 3 seconds### VibHub
+### VibHub
 
-VibHub is a Twitter-like social media platform with integrated facial expression recognition capabilities. This project was developed as part of a hackathon at IPSSI school.
+VibHub est une plateforme de médias sociaux similaire à Twitter avec des capacités intégrées de reconnaissance d'expressions faciales. Ce projet a été développé dans le cadre d'un hackathon à l'école IPSSI.
 
-## Project Overview
+## Aperçu du Projet
 
-VibHub allows users to publish tweets, interact with posts from others, and includes an AI component for Facial Expression Recognition (FER). The application can detect emotions such as joy, sadness, anger, surprise, disgust, fear, and neutral expressions in real-time through a user's webcam.
+VibHub permet aux utilisateurs de publier des tweets, d'interagir avec les publications des autres, et inclut une composante IA pour la Reconnaissance d'Expressions Faciales (FER). L'application peut détecter des émotions telles que la joie, la tristesse, la colère, la surprise, le dégoût, la peur et les expressions neutres en temps réel via la webcam d'un utilisateur.
 
-## Team Members (Group 33)
+## Membres de l'Équipe (Groupe 33)
 
 - Quentin WAROQUET
 - Marine RAPIN
@@ -16,26 +16,26 @@ VibHub allows users to publish tweets, interact with posts from others, and incl
 - Florian MULLER
 
 
-## Features
+## Fonctionnalités
 
-### Core Functionality
+### Fonctionnalités Principales
 
-- **Tweet Publication**: Users can post short messages with text, images, and videos
-- **Hashtags & Mentions**: Support for hashtags and user mentions
-- **Tweet Interactions**: Like, retweet, reply, and bookmark functionality
-- **Personalized Feed**: Customized content based on user preferences and interactions
-- **Real-time Notifications**: Alerts for likes, retweets, replies, and new followers
-- **Advanced Search**: Find tweets, users, or hashtags with various filtering options
-- **User Profiles**: Customizable profiles with bio, profile picture, and activity history
-
-
-### AI Component
-
-- **Facial Expression Recognition**: Real-time emotion detection through webcam
-- **Emotion Categories**: Joy, sadness, anger, surprise, disgust, fear, and neutral
+- **Publication de Tweets**: Les utilisateurs peuvent poster des messages courts avec du texte, des images et des vidéos
+- **Hashtags & Mentions**: Support pour les hashtags et les mentions d'utilisateurs
+- **Interactions avec les Tweets**: Fonctionnalités de like, retweet, réponse et marque-page
+- **Fil d'Actualité Personnalisé**: Contenu personnalisé basé sur les préférences et interactions de l'utilisateur
+- **Notifications en Temps Réel**: Alertes pour les likes, retweets, réponses et nouveaux abonnés
+- **Recherche Avancée**: Trouvez des tweets, utilisateurs ou hashtags avec diverses options de filtrage
+- **Profils Utilisateurs**: Profils personnalisables avec bio, photo de profil et historique d'activité
 
 
-## Technologies Used
+### Composante IA
+
+- **Reconnaissance d'Expressions Faciales**: Détection d'émotions en temps réel via webcam
+- **Catégories d'Émotions**: Joie, tristesse, colère, surprise, dégoût, peur et neutre
+
+
+## Technologies Utilisées
 
 ### Frontend
 
@@ -47,27 +47,35 @@ VibHub allows users to publish tweets, interact with posts from others, and incl
 
 - Node.js
 - Express.js
-- MongoDB Atlas
+- MongoDB Compass
 
 
-### AI Component
+### Composante IA
 
-- Deep Learning CNN Model
-- Flask API
+- Modèle CNN de Deep Learning
+- API Flask
 
 
-### Deployment
+### Déploiement
 
 - Docker
 
 
-## Installation & Setup
+## Installation & Configuration
 
-### Option 1: Using Docker (Recommended)
+### Option 1: Utilisation de Docker (Recommandée)
 
-1. Clone the repository
-2. Navigate to the project root directory
-3. Run the following command:
+1. Clonez le dépôt
+2. Naviguez vers le répertoire racine du projet
+
+1. Créez un fichier `.env` à la racine du répertoire backend avec le contenu suivant:
+
+```plaintext
+MONGO_URI=mongodb://localhost:27017/vibehub
+PORT=5000
+JWT_SECRET=your_secret_key
+```
+3. Exécutez la commande suivante:
 
 ```plaintext
 docker-compose up --build
@@ -76,11 +84,11 @@ docker-compose up --build
 
 
 
-### Option 2: Manual Setup
+### Option 2: Configuration Manuelle
 
-#### Backend Setup
+#### Configuration du Backend
 
-1. Create a `.env` file in the root of the backend directory with the following content:
+1. Créez un fichier `.env` à la racine du répertoire backend avec le contenu suivant:
 
 ```plaintext
 MONGO_URI=mongodb://localhost:27017/vibehub
@@ -89,21 +97,21 @@ JWT_SECRET=your_secret_key
 ```
 
 
-2. Navigate to the backend directory:
+2. Naviguez vers le répertoire backend:
 
 ```plaintext
 cd vibehub-backend
 ```
 
 
-3. Install dependencies:
+3. Installez les dépendances:
 
 ```plaintext
 npm install
 ```
 
 
-4. Start the backend server:
+4. Démarrez le serveur backend:
 
 ```plaintext
 npm run dev
@@ -112,24 +120,24 @@ npm run dev
 
 
 
-#### Frontend Setup
+#### Configuration du Frontend
 
-1. Open a new terminal
-2. Navigate to the frontend directory:
+1. Ouvrez un nouveau terminal
+2. Naviguez vers le répertoire frontend:
 
 ```plaintext
 cd vibehub-frontend
 ```
 
 
-3. Install dependencies:
+3. Installez les dépendances:
 
 ```plaintext
 npm install
 ```
 
 
-4. Start the frontend development server:
+4. Démarrez le serveur de développement frontend:
 
 ```plaintext
 npm run dev
@@ -138,27 +146,27 @@ npm run dev
 
 
 
-## Project Structure
+## Structure du Projet
 
 ```plaintext
 vibehub/
-├── vibehub-frontend/     # React.js frontend
-├── vibehub-backend/      # Node.js & Express backend
-├── vibehub-ai/           # AI component with Flask API
-├── docker-compose.yml    # Docker configuration
-└── README.md             # Project documentation
+├── vibehub-frontend/     # Frontend React.js
+├── vibehub-backend/      # Backend Node.js & Express
+├── vibehub-ai/           # Composante IA avec API Flask
+├── docker-compose.yml    # Configuration Docker
+└── README.md             # Documentation du projet
 ```
 
-## Usage
+## Utilisation
 
-After starting the application:
+Après avoir démarré l'application:
 
-1. Access the web interface at `http://localhost:3000`
-2. Create an account or log in
-3. Start posting tweets and interacting with other users
-4. Enable your webcam to use the facial expression recognition feature
+1. Accédez à l'interface web à `http://localhost:3000`
+2. Créez un compte ou connectez-vous
+3. Commencez à publier des tweets et à interagir avec d'autres utilisateurs
+4. Activez votre webcam pour utiliser la fonctionnalité de reconnaissance d'expressions faciales
 
 
-## License
+## Licence
 
-This project was created for educational purposes as part of a hackathon at IPSSI school.
+Ce projet a été créé à des fins éducatives dans le cadre d'un hackathon à l'école IPSSI.
