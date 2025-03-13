@@ -19,20 +19,20 @@ class AIService {
         }
     }
 
-    /**
-     * Résume un texte
-     * @param content - Texte à résumer
-     * @returns Résumé du texte
-     */
-    static async summarizeText(content: string): Promise<string> {
-        try {
-            const response = await axios.post(`${API_URL}/resume`, { content });
-            return response.data;
-        } catch (error) {
-            console.error("Erreur lors du résumé du texte:", error);
-            throw error;
-        }
-    }
+    // /**
+    //  * Résume un texte
+    //  * @param content - Texte à résumer
+    //  * @returns Résumé du texte
+    //  */
+    // static async summarizeText(content: string): Promise<string> {
+    //     try {
+    //         const response = await axios.post(`${API_URL}/resume`, { content });
+    //         return response.data;
+    //     } catch (error) {
+    //         console.error("Erreur lors du résumé du texte:", error);
+    //         throw error;
+    //     }
+    // }
 }
 
 export default AIService;

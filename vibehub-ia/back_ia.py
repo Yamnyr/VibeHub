@@ -116,7 +116,7 @@ def translate():
 
 
 @app.route("/resume", methods=["POST"])
-def resume():    
+def resume():
     """ résumé d'un post """
     data = request.get_json()
     print(data)
