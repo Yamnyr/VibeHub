@@ -35,7 +35,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, handleToggleFollow, isFollowi
             onClick={handleCardClick}
         >
             <div className="flex items-center space-x-3">
-                <AvatarPlaceholder src={user.profilePicture} size="medium" />
+                <AvatarPlaceholder src={"http://localhost:5000/" + user.profilePicture} size="medium" />
                 <div>
                     <h4 className="font-bold text-[var(--text-primary)]">{user.username}</h4>
                     <p className="text-gray-500">@{user.username}</p>

@@ -145,33 +145,51 @@ exports.updateProfile = async (req, res) => {
     }
 };
 
-// Obtenir le profil d'un utilisateur par son ID
 exports.getUserById = async (req, res) => {
     try {
-        let userId = req.params.id;
+        const requestingUserId = req.userId; // ID de l'utilisateur qui fait la requête
+        const user = await User.findById(req.params.id).select('-password');
 
-        if (userId === "me") {
-            userId = req.userId;
-        }
-
-        // ✅ Vérification améliorée de l'ObjectId
-        if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
-            console.log("❌ ID utilisateur invalide détecté:", userId);
-            return res.status(400).json({ error: "ID utilisateur invalide" });
-        }
-
-        const user = await User.findById(userId).select("-password");
         if (!user) {
-            return res.status(404).json({ error: "Utilisateur non trouvé" });
+            return res.status(404).json({ error: 'Utilisateur non trouvé' });
         }
 
-        res.status(200).json(user);
+        // Récupérer les posts likés, enregistrés et repostés depuis la collection Post
+        const likedPosts = await Post.find({ likes: user._id })
+            .populate('userId', 'username profilePicture')
+            .lean();
+
+        const savedPosts = await Post.find({ signets: user._id })
+            .populate('userId', 'username profilePicture')
+            .lean();
+
+        const repostedPosts = await Post.find({ reposts: user._id })
+            .populate('userId', 'username profilePicture')
+            .lean();
+
+        // Ajouter les indicateurs isLiked, isReposted, isSigneted pour chaque post
+        const processPostList = (posts) => {
+            return posts.map(post => {
+                return {
+                    ...post,
+                    isLiked: Array.isArray(post.likes) && post.likes.some(like => like && requestingUserId && like.toString() === requestingUserId.toString()),
+                    isReposted: Array.isArray(post.reposts) && post.reposts.some(repost => repost && requestingUserId && repost.toString() === requestingUserId.toString()),
+                    isSigneted: Array.isArray(post.signets) && post.signets.some(signet => signet && requestingUserId && signet.toString() === requestingUserId.toString())
+                };
+            });
+        };
+
+        res.status(200).json({
+            ...user.toObject(),
+            likedPosts: processPostList(likedPosts),
+            savedPosts: processPostList(savedPosts),
+            repostedPosts: processPostList(repostedPosts)
+        });
     } catch (err) {
-        console.error("❌ Erreur lors de la récupération du profil:", err);
-        res.status(500).json({ error: "Erreur lors de la récupération du profil" });
+        console.error(err);
+        res.status(500).json({ error: 'Erreur lors de la récupération du profil' });
     }
 };
-
 // Obtenir le profil d'un utilisateur par son nom d'utilisateur
 exports.getUserByUsername = async (req, res) => {
     try {
