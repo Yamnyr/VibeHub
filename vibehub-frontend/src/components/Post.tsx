@@ -1,67 +1,76 @@
-import React, { useState } from "react";
+// Dans Post.ProfileTabs.tsx
+
+import React, { useEffect, useState } from "react";
 import { Heart, MessageCircle, Repeat2, Bookmark } from "lucide-react";
 import PostService from "../services/postService";
 import { useNavigate } from "react-router-dom";
 import AvatarPlaceholder from "./Avatar.tsx";
 
-interface PostUser {
-  id: string;
-  avatar: string;
-  username: string;
-  profilePicture: string;
-}
-
+// Modifiez l'interface des props pour ne recevoir que l'ID
 interface PostProps {
-  id?: string;
-  user: PostUser;
-  content: string;
-  time: string;
-  comments?: number;
-  likes?: number;
-  shares?: number;
-  signets?: number;
-  isLiked?: boolean;
-  isReposted?: boolean;
-  isSigneted?: boolean;
-  media?: string[]; // Liste des URL des médias
+  id: string;
 }
 
-const Post: React.FC<PostProps> = ({
-                                     id,
-                                     user,
-                                     content,
-                                     time,
-                                     comments = 0,
-                                     likes = 0,
-                                     shares = 0,
-                                     signets = 0,
-                                     isLiked = false,
-                                     isReposted = false,
-                                     isSigneted = false,
-                                     media = [],
-                                   }) => {
+const Post: React.FC<PostProps> = ({ id }) => {
   const navigate = useNavigate();
-  const [isLikedState, setIsLikedState] = useState(isLiked);
-  const [isRepostedState, setIsRepostedState] = useState(isReposted);
-  const [isSignetedState, setIsSignetedState] = useState(isSigneted);
-  const [likeCount, setLikeCount] = useState(likes);
-  const [sharesCount, setSharesCount] = useState(shares);
-  const [signetsCount, setSignetsCount] = useState(signets);
+  const [post, setPost] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLikedState, setIsLikedState] = useState(false);
+  const [isRepostedState, setIsRepostedState] = useState(false);
+  const [isSignetedState, setIsSignetedState] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [sharesCount, setSharesCount] = useState(0);
+  const [signetsCount, setSignetsCount] = useState(0);
+  const [commentsCount, setCommentsCount] = useState(0);
 
-  // Fonction pour déterminer si un média est une vidéo
+  // Charger les données du post au chargement du composant
+  useEffect(() => {
+    const fetchPostData = async () => {
+      setIsLoading(true);
+      try {
+        const postData = await PostService.getPostById(id);
+        setPost(postData);
+        setIsLikedState(postData.isLiked || false);
+        setIsRepostedState(postData.isReposted || false);
+        setIsSignetedState(postData.isSigneted || false);
+        setLikeCount(postData.likes?.length || 0);
+        setSharesCount(postData.reposts?.length || 0);
+        setSignetsCount(postData.signets?.length || 0);
+        setCommentsCount(postData.comments?.length || 0);
+      } catch (error) {
+        console.error("Erreur lors du chargement du post:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPostData();
+  }, [id]);
+
+  // Fonction pour formater le temps (inchangée)
+  const formatTime = (date: Date): string => {
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (diffInSeconds < 60) return `${diffInSeconds}s`;
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h`;
+    return `${Math.floor(diffInSeconds / 86400)}j`;
+  };
+
+  // Fonction pour déterminer si un média est une vidéo (inchangée)
   const isVideo = (url: string) => {
     const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi'];
     return videoExtensions.some(ext => url.toLowerCase().endsWith(ext));
   };
 
+  // Les gestionnaires d'événements restent en grande partie inchangés
   const handleFavoriteClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
     try {
-      if (id) {
-        await PostService.toggleFavorite(id);
-        setIsLikedState(!isLikedState);
-        setLikeCount(isLikedState ? likeCount - 1 : likeCount + 1);
-      }
+      await PostService.toggleFavorite(id);
+      setIsLikedState(!isLikedState);
+      setLikeCount(isLikedState ? likeCount - 1 : likeCount + 1);
     } catch (error) {
       console.error("Erreur lors du toggle des favoris :", error);
     }
@@ -70,11 +79,9 @@ const Post: React.FC<PostProps> = ({
   const handleRepostClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
     try {
-      if (id) {
-        await PostService.toggleRepost(id);
-        setIsRepostedState(!isRepostedState);
-        setSharesCount(isRepostedState ? sharesCount - 1 : sharesCount + 1);
-      }
+      await PostService.toggleRepost(id);
+      setIsRepostedState(!isRepostedState);
+      setSharesCount(isRepostedState ? sharesCount - 1 : sharesCount + 1);
     } catch (error) {
       console.error("Erreur lors du toggle du repost :", error);
     }
@@ -83,40 +90,52 @@ const Post: React.FC<PostProps> = ({
   const handleSignetClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
     try {
-      if (id) {
-        await PostService.toggleSignet(id);
-        setIsSignetedState(!isSignetedState);
-        setSignetsCount(isSignetedState ? signetsCount - 1 : signetsCount + 1);
-      }
+      await PostService.toggleSignet(id);
+      setIsSignetedState(!isSignetedState);
+      setSignetsCount(isSignetedState ? signetsCount - 1 : signetsCount + 1);
     } catch (error) {
       console.error("Erreur lors du toggle du signet :", error);
     }
   };
 
-  // Fonction pour obtenir l'URL complète d'un média
+  // Fonction pour obtenir l'URL complète d'un média (inchangée)
   const getMediaUrl = (url: string) => {
-    // Si l'URL est déjà absolue, ne pas la modifier
     if (url.startsWith('http') || url.startsWith('https')) {
       return url;
     }
-
-    // Si l'URL est relative, préfixer avec l'URL de l'API
     const API_URL = "http://localhost:5000/";
     return `${API_URL}${url}`;
   };
 
   const handleProfileClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Empêche d'ouvrir le post en même temps
-    navigate(`/profile/${user.id}`);
-  };
-
-  // Fonction pour rediriger vers la page du post
-  const handlePostClick = () => {
-    if (id) {
-      navigate(`/post/${id}`);
+    e.stopPropagation();
+    if (post && post.userId) {
+      navigate(`/profile/${post.userId._id}`);
     }
   };
-  console.log(user)
+
+  const handlePostClick = () => {
+    navigate(`/post/${id}`);
+  };
+
+  // Afficher un état de chargement pendant que les données sont récupérées
+  if (isLoading) {
+    return (
+        <div className="bg-[var(--bg-secondary)] border border-gray-700 rounded-lg p-4 text-center">
+          Chargement du post...
+        </div>
+    );
+  }
+
+  // Si post est null ou undefined après le chargement, quelque chose s'est mal passé
+  if (!post) {
+    return (
+        <div className="bg-[var(--bg-secondary)] border border-gray-700 rounded-lg p-4 text-center">
+          Impossible de charger le post.
+        </div>
+    );
+  }
+
   return (
       <div
           className="bg-[var(--bg-secondary)] border border-gray-700 rounded-lg p-4 cursor-pointer hover:bg-opacity-80 transition-all"
@@ -124,24 +143,24 @@ const Post: React.FC<PostProps> = ({
       >
         <div className="flex space-x-4">
           <div onClick={handleProfileClick} className="cursor-pointer">
-            <AvatarPlaceholder src={user.avatar} size="w-16 h-16" />
+            <AvatarPlaceholder src={post.userId.profilePicture} size="w-16 h-16"/>
           </div>
 
           <div className="flex-1">
             <div className="flex items-center space-x-2">
             <span className="font-bold text-[var(--text-primary)]">
-              {user.username}
+              {post.userId.username}
             </span>
               <span className="text-gray-500 text-sm">
-              @{user.username} · {time}
+              @{post.userId.username} · {formatTime(new Date(post.createdAt))}
             </span>
             </div>
-            <p className="text-[var(--text-primary)] mt-2">{content}</p>
+            <p className="text-[var(--text-primary)] mt-2">{post.content}</p>
 
             {/* Affichage des médias */}
-            {media && media.length > 0 && (
-                <div className={`grid gap-2 mt-3 ${media.length > 1 ? "grid-cols-2" : "grid-cols-1"}`}>
-                  {media.map((url, index) => {
+            {post.media && post.media.length > 0 && (
+                <div className={`grid gap-2 mt-3 ${post.media.length > 1 ? "grid-cols-2" : "grid-cols-1"}`}>
+                  {post.media.map((url: string, index: number) => {
                     const fullUrl = getMediaUrl(url);
                     return (
                         <div key={index} className="overflow-hidden rounded-lg border border-gray-600">
@@ -167,7 +186,7 @@ const Post: React.FC<PostProps> = ({
             {/* Icônes d'interaction */}
             <div className="flex justify-between text-gray-500 mt-3 text-sm">
               <div className="flex items-center space-x-2 cursor-pointer hover:text-[var(--accent)]">
-                <MessageCircle size={18}/> <span>{comments}</span>
+                <MessageCircle size={18}/> <span>{commentsCount}</span>
               </div>
               <div className="flex items-center space-x-2 cursor-pointer hover:text-[var(--accent)]"
                    onClick={handleRepostClick}>

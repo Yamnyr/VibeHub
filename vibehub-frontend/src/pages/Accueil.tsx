@@ -34,49 +34,11 @@ export default function Accueil() {
   };
 
   const handlePostCreated = () => {
-    loadFeed(); // Recharger le feed après la création d'un post
-  };
-
-  // Formatage des données pour correspondre à l'interface du composant Post
-  const formatPosts = (posts: PostType[]) => {
-    return posts.map(post => {
-      const formattedPost = {
-        id: post._id,
-        user: {
-          id: post.userId._id,
-          avatar: post.userId.profilePicture,
-          username: post.userId.username,
-        },
-        content: post.content,
-        time: formatTime(new Date(post.createdAt)),
-        comments: post.commentsCount || 0,
-        likes: post.likesCount || 0,
-        shares: post.repostsCount || 0,
-        signets: post.signetsCount || 0,
-        isLiked: post.isLiked,
-        isReposted: post.isReposted,
-        isSigneted: post.isSigneted,
-        media: post.media || [], // Inclure les médias du post
-      };
-
-      return formattedPost;
-    });
-  };
-
-  // Fonction pour formater le temps (ex: "il y a 2h")
-  const formatTime = (date: Date): string => {
-    const now = new Date();
-    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-    if (diffInSeconds < 60) return `${diffInSeconds}s`;
-    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m`;
-    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h`;
-    return `${Math.floor(diffInSeconds / 86400)}j`;
+    loadFeed();
   };
 
   return (
       <div className="max-w-xl mx-auto mt-5">
-        {/* Sélecteur de type de feed */}
         <div className="bg-[var(--bg-secondary)] p-4 rounded-lg border border-gray-700 mb-4">
           <div className="flex space-x-2">
             <button
@@ -98,12 +60,10 @@ export default function Accueil() {
           </div>
         </div>
 
-        {/* Input pour créer un nouveau post - remplacé par le composant CreatePost */}
         {isAuthenticated && (
             <CreatePost onPostCreated={handlePostCreated} />
         )}
 
-        {/* Affichage des posts */}
         <div className="mt-5 space-y-4">
           {isLoading ? (
               <div className="text-center p-4">Chargement des posts...</div>
@@ -113,8 +73,8 @@ export default function Accueil() {
                 {feedType === "personal" && " Commencez à suivre des utilisateurs pour voir leurs posts."}
               </div>
           ) : (
-              formatPosts(posts).map((post, index) => (
-                  <Post key={post.id || index} {...post} />
+              posts.map((post) => (
+                  <Post key={post._id} id={post._id} />
               ))
           )}
         </div>

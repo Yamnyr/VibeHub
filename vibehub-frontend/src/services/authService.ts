@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, {AxiosRequestConfig} from 'axios';
 
 // URL de base de l'API - à ajuster selon votre configuration
 const API_URL = 'http://localhost:5000/api/users';

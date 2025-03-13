@@ -31,8 +31,8 @@ const seedDatabase = async () => {
         console.log(`✅ Created ${hashtags.length} hashtags`)
 
         // 5. Create follows between users
-        const follows = await followSeeder.seed(users)
-        console.log(`✅ Created ${follows.length} follows`)
+        // const follows = await followSeeder.seed(users)
+        // console.log(`✅ Created ${follows.length} follows`)
 
         // 8. Create notifications based on interactions
         // const notifications = await notificationSeeder.seed(users)

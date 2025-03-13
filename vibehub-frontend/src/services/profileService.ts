@@ -176,6 +176,33 @@ const ProfileService = {
             throw error;
         }
     },
+    toggleFollow: async (userId: string): Promise<{isFollowing: boolean}> => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                throw new Error('Vous devez être connecté pour suivre un utilisateur');
+            }
+
+            const response = await axios.post(
+                `${API_URL}/users/${userId}/toggle-follow`,
+                {},
+                {
+                    headers: {
+                        Authorization: token ? `Bearer ${token}` : "",
+                    } as AxiosRequestConfig["headers"],
+                }
+            );
+
+            return response.data;
+        } catch (error: any) {
+            throw new Error(
+                error.response?.data?.error ||
+                error.response?.data?.message ||
+                'Erreur lors de la modification de l\'abonnement'
+            );
+        }
+    }
+
 };
 
 export default ProfileService;
