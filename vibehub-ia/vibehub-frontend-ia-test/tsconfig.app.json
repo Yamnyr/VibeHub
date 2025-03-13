@@ -22,5 +22,9 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
+  "paths": {
+    "inferencejs": ["./node_modules/inferencejs/dist/index.d.ts"]
+  }
+  ,
   "include": ["src"]
 }

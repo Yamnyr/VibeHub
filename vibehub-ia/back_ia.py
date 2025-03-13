@@ -10,9 +10,12 @@ from io import BytesIO
 import os
 from detoxify import Detoxify
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+from inference import get_model
 
 app = Flask(__name__)
 CORS(app)  # Autoriser les requêtes depuis le front
+modelInference = get_model(api_key="WGL2RlqrhHutBKZQo7Vb", # Roboflow API key
+    model_id="my-first-project-cmhed/1")
 
 # Charger le modèle de reconnaissance d’émotions
 MODEL_NAME = "Rajaram1996/FacialEmoRecog"
@@ -73,6 +76,17 @@ def predict():
     result = detect_emotion(image_array)
 
     return jsonify(result)
+@app.route("/predictYolo", methods=["POST"])
+def predictYolo():
+    print("je suis la ")
+    """ Endpoint pour prédire l’émotion à partir d’une image """
+    data = request.get_json()
+    if "image" not in data:
+        return jsonify({"error": "Aucune image fournie"}), 400
+    # print(data["image"])
+    results = modelInference.infer(data["image"])
+    print(results[0].predictions[0].class_name)
+    return jsonify(results[0].predictions[0].class_name)
 
 @app.route("/moderate", methods=["POST"])
 def moderate():

@@ -6,6 +6,7 @@ import Webcam from "react-webcam";
 
 const AvatarPlaceholder = ({ src, size = "w-24 h-24" }: { src?: string; size?: string }) => {
     const webcamRef = useRef<Webcam>(null);
+    
     return (
         <div className={`${size} rounded-full border-4 border-[var(--bg-secondary)] flex items-center justify-center overflow-hidden bg-gray-300`}>
             {src ? (
@@ -13,7 +14,7 @@ const AvatarPlaceholder = ({ src, size = "w-24 h-24" }: { src?: string; size?: s
             ) : (
                 <Webcam ref={webcamRef} className='transform scale-[1.35]
             ' screenshotFormat="image/jpeg"  />
-
+                
             )}
         </div>
     );
