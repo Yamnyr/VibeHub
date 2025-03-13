@@ -33,9 +33,9 @@ function Sidebar() {
                         </Link>
                     )}
 
-                    {/* <Link to="#" className="flex items-center space-x-3 text-lg text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors">
+                    <Link to="/parametre" className="flex items-center space-x-3 text-lg text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors">
                         <Settings /> <span>Settings</span>
-                    </Link> */}
+                    </Link>
                 </nav>
 
                 <div className="mt-auto">
