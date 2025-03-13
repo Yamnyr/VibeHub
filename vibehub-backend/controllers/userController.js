@@ -109,11 +109,21 @@ exports.updateProfile = async (req, res) => {
             return res.status(404).json({ error: 'Utilisateur non trouvé' });
         }
 
+        console.log(req.files?.profilePicture)
+
+        if (req.files) {
+            user.profilePicture = `uploads/${req.files[0].filename}`;
+        }
+
+        if (req.files?.banner) {
+            user.banner = `uploads/${req.files.banner[0].filename}`;
+        }
+
         // Mettre à jour les informations de l'utilisateur
         if (username) user.username = username;
         if (bio !== undefined) user.bio = bio;
-        if (profilePicture) user.profilePicture = profilePicture;
-        if (banner) user.banner = banner;
+        //if (profilePicture) user.profilePicture = profilePicture;
+        //if (banner) user.banner = banner;
 
         await user.save();
 

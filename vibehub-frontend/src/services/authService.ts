@@ -22,6 +22,7 @@ interface AuthResponse {
         username: string;
         email: string;
         profilePicture?: string;
+        banner?: string;
         bio?: string;
         followersCount: number;
         followingCount: number;
@@ -145,18 +146,24 @@ export const authService = {
         }
     },
 
-    // Mettre à jour le profil de l'utilisateur
     updateProfile: async (profileData: ProfileData): Promise<any> => {
         try {
-            const response = await axios.put(`${API_URL}/profile`, profileData);
+            const formData = new FormData();
+            if (profileData.username) formData.append("username", profileData.username);
+            if (profileData.bio) formData.append("bio", profileData.bio);
+            if (profileData.profilePicture) formData.append("profilePicture", profileData.profilePicture);
+            if (profileData.banner) formData.append("banner", profileData.banner);
+
+            const response = await axios.put(`${API_URL}/profile`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            });
 
             // Mettre à jour les informations utilisateur dans localStorage
             if (response.data.user) {
-                const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-                localStorage.setItem('user', JSON.stringify({
-                    ...currentUser,
-                    ...response.data.user
-                }));
+                localStorage.setItem('user', JSON.stringify(response.data.user));
             }
 
             return response.data;

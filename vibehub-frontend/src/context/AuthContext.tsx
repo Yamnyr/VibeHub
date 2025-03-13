@@ -9,6 +9,7 @@ interface User {
     username: string;
     email: string;
     profilePicture?: string;
+    banner?: string;
     bio?: string;
     followers: string[]; // ✅ Liste des IDs des abonnés
     following: string[];
