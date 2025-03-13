@@ -1,6 +1,7 @@
 import React from "react";
 import { useAuth } from "../context/AuthContext.tsx";
 import AvatarPlaceholder from "../components/Avatar.tsx";
+import { User as UserIcon } from "lucide-react";
 
 const UserProfile = () => {
   const { user } = useAuth();
@@ -17,14 +18,14 @@ const UserProfile = () => {
             
             {/* ✅ Profil avec Avatar et Infos utilisateur */}
             <div className="flex items-center space-x-4">
-                <AvatarPlaceholder src={user.profilePicture} size="w-16 h-16" />
+                <AvatarPlaceholder src={user.profilePicture} size="w-48 h-48" />
                 {/* ✅ Informations utilisateur à droite */}
-                <div className="text-left">
-                    <h2 className="text-xl font-bold text-white">{user.username}</h2>
-                    <p className="text-gray-400 text-sm">@{user.username}</p>
-                </div>
+                
+                  
             </div>
-
+            <p><h2 className="text-xl font-bold text-white">{user.username}</h2></p>
+                    <p className="text-gray-400 text-sm">@{user.username}</p>
+                    <UserIcon size={48} className="text-gray-500" />
         {/* Email */}
         <p className="text-sm text-gray-300 mb-4">{user.email}</p>
 
