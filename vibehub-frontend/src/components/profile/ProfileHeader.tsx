@@ -37,7 +37,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 <div className="-mt-16 flex items-start justify-between">
                     <div className="flex space-x-4">
                         <div className="border-4 border-[var(--bg-secondary)] rounded-full">
-                            <AvatarPlaceholder src={user.profilePicture} size="large" />
+                            <AvatarPlaceholder src={"http://localhost:5000/" + user.profilePicture} size="large" />
                         </div>
                         <div className="mt-10">
                             <h2 className="text-xl font-bold text-[var(--text-primary)]">{user.username}</h2>

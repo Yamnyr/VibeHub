@@ -1,6 +1,7 @@
 const express = require('express');
 const userController = require('../controllers/userController');
 const authMiddleware = require('../middleware/authMiddleware');
+const upload = require('../middleware/uploadMiddleware')
 
 const router = express.Router();
 
@@ -15,7 +16,7 @@ router.get('/:id/following', userController.getFollowing);
 
 // Routes protégées (nécessitent une authentification)
 router.get('/me', authMiddleware, userController.getCurrentUser);
-router.put('/profile', authMiddleware, userController.updateProfile);
+router.put('/profile', authMiddleware, upload.array("profilePicture", 1), userController.updateProfile);
 // router.get('/signets', authMiddleware, userController.getUserSignets);
 // router.post('/:id/follow', authMiddleware, userController.followUser);
 // router.delete('/:id/follow', authMiddleware, userController.unfollowUser);
