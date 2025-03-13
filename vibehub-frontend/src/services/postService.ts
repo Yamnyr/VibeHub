@@ -15,7 +15,7 @@ export interface Post {
     hashtags?: string[]
     createdAt: string
     updatedAt: string
-    comments: number
+    commentsCount: number
     likes: string[]  // Liste des IDs des utilisateurs ayant liké
     reposts: string[] // Liste des IDs des utilisateurs ayant reposté
     signets: string[] // Liste des IDs des utilisateurs ayant reposté

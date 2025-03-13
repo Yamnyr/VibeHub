@@ -9,7 +9,7 @@ interface Comment {
   userId: {
     _id: string;
     username: string;
-    profileImage: string;
+    profilePicture: string;
   };
   content: string;
   createdAt: string;
@@ -96,19 +96,19 @@ const PostDetail: React.FC = () => {
 
   const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     if (!newComment.trim() || !id) return;
-  
+
     try {
       const response = await PostService.createPost({
         content: newComment,
         parentId: id,
       });
-  
+
       console.log("Réponse du serveur après création :", response);
-  
+
       setNewComment("");
-  
+
       // Vérifie que la réponse contient bien les nouvelles données
       const updatedComments = await PostService.getPostComments(id);
       console.log("Commentaires mis à jour :", updatedComments);
@@ -117,7 +117,7 @@ const PostDetail: React.FC = () => {
       console.error("Erreur lors de l'envoi du commentaire:", error);
     }
   };
-   
+
 
   const formatTime = (dateString: string): string => {
     const date = new Date(dateString);
@@ -283,7 +283,7 @@ const PostDetail: React.FC = () => {
                 {comments.map((comment) => (
                     <div key={comment._id} className="flex space-x-3">
                       <img
-                          src={comment.userId.profileImage || "/placeholder.svg"}
+                          src={"http://localhost:5000/" + comment.userId.profilePicture}
                           alt={comment.userId.username}
                           className="w-8 h-8 rounded-full"
                       />

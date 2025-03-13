@@ -36,7 +36,7 @@ const Post: React.FC<PostProps> = ({ id }) => {
         setLikeCount(postData.likes?.length || 0);
         setSharesCount(postData.reposts?.length || 0);
         setSignetsCount(postData.signets?.length || 0);
-        setCommentsCount(postData.comments?.length || 0);
+        setCommentsCount(postData.commentsCount || 0);
       } catch (error) {
         console.error("Erreur lors du chargement du post:", error);
       } finally {

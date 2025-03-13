@@ -5,17 +5,17 @@ exports.createPost = async (req, res) => {
     try {
         const { content, hashtags, parentId } = req.body;
         const userId = req.userId;
-        // const flaskResponse = await fetch("http://vibehub-ia:5001/moderate", {
-        //     method: "POST",
-        //     headers: { "Content-Type": "application/json" },
-        //     body: JSON.stringify({ content }),
-        // });
-        //
-        // const flaskData = await flaskResponse.json();
-        // console.log(flaskData);
-        // if (flaskData.IsToxic === true) {
-        //     return res.status(400).json({ message: "Contenu inapproprié" });
-        // }
+        const flaskResponse = await fetch("http://vibehub-ia:5001/moderate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ content }),
+        });
+
+        const flaskData = await flaskResponse.json();
+        console.log(flaskData);
+        if (flaskData.IsToxic === true) {
+            return res.status(400).json({ message: "Contenu inapproprié" });
+        }
         if (!content && (!req.files || Object.keys(req.files).length === 0)) {
             return res.status(400).json({ message: "Un post doit contenir du texte ou un média" });
         }
