@@ -16,7 +16,7 @@ router.get('/:id/following', userController.getFollowing);
 
 // Routes protégées (nécessitent une authentification)
 router.get('/me', authMiddleware, userController.getCurrentUser);
-router.put('/profile', authMiddleware, upload.array("profilePicture", 1), userController.updateProfile);
+router.put('/profile', authMiddleware, upload, userController.updateProfile);
 // router.get('/signets', authMiddleware, userController.getUserSignets);
 // router.post('/:id/follow', authMiddleware, userController.followUser);
 // router.delete('/:id/follow', authMiddleware, userController.unfollowUser);

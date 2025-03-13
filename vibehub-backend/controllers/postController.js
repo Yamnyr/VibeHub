@@ -5,18 +5,31 @@ exports.createPost = async (req, res) => {
     try {
         const { content, hashtags, parentId } = req.body;
         const userId = req.userId;
-        const media = req.files.map(file => `uploads/${file.filename}`); // Générer les URLs des fichiers
-        const flaskResponse = await fetch("http://vibehub-ia:5001/moderate", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ content }),
-        });
-
-        const flaskData = await flaskResponse.json();
-        console.log(flaskData);
-        if (flaskData.IsToxic === true) {
-            return res.status(400).json({ message: "Contenu inapproprié" });
+        // const flaskResponse = await fetch("http://vibehub-ia:5001/moderate", {
+        //     method: "POST",
+        //     headers: { "Content-Type": "application/json" },
+        //     body: JSON.stringify({ content }),
+        // });
+        //
+        // const flaskData = await flaskResponse.json();
+        // console.log(flaskData);
+        // if (flaskData.IsToxic === true) {
+        //     return res.status(400).json({ message: "Contenu inapproprié" });
+        // }
+        if (!content && (!req.files || Object.keys(req.files).length === 0)) {
+            return res.status(400).json({ message: "Un post doit contenir du texte ou un média" });
         }
+
+        let media = [];
+
+        if (req.files) {
+            if (Array.isArray(req.files)) {
+                media = req.files.map(file => `uploads/${file.filename}`);
+            } else if (typeof req.files === "object") {
+                media = Object.values(req.files).flat().map(file => `uploads/${file.filename}`);
+            }
+        }
+
         const newPost = new Post({
             userId,
             content,
@@ -26,19 +39,15 @@ exports.createPost = async (req, res) => {
         });
 
         await newPost.save();
+        console.log("✅ Post enregistré dans la base de données :", newPost);
 
         if (parentId) {
             await Post.findByIdAndUpdate(parentId, { $inc: { commentsCount: 1 } });
-            const originalPost = await Post.findById(parentId);
-            if (
-                connectedUsers.has(originalPost.userId.toString())) {
-                io.to(connectedUsers.get(originalPost.userId.toString())).emit("newComment", newPost);
-            }
-
         }
 
         res.status(201).json({ message: "Post créé avec succès", post: newPost });
     } catch (error) {
+        console.error("❌ Erreur lors de la création du post :", error);
         res.status(500).json({ message: "Erreur lors de la création du post", error });
     }
 };

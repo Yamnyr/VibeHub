@@ -33,8 +33,8 @@ interface AuthResponse {
 interface ProfileData {
     username?: string;
     bio?: string;
-    profilePicture?: string;
-    banner?: string;
+    profilePicture?: File;
+    banner?: File;
     [key: string]: any;
 }
 
