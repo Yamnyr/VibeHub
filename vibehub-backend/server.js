@@ -37,7 +37,7 @@ io.on("connection", (socket) => {
         console.log(`Utilisateur ${userId} connecté avec le socket ${socket.id}`);
     });
 
-    io.to(userId).emit("newComment", { message: "Nouveau commentaire" });
+    //io.to(userId).emit("newComment", { message: "Nouveau commentaire" });
 
     // 🔹 Gestion de la déconnexion
     socket.on("disconnect", () => {
