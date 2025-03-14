@@ -170,3 +170,5 @@ Après avoir démarré l'application:
 ## Licence
 
 Ce projet a été créé à des fins éducatives dans le cadre d'un hackathon à l'école IPSSI.
+
+[Trello Hackathon VibHub](https://trello.com/invite/b/67ceb7570e836b0a90b439af/ATTI049799397bc771aaf17bf32d4b8b96a714CEF6A3/hackathon)
